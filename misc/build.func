@@ -681,6 +681,240 @@ advanced_settings() {
   fi
 }
 
+config_file(){
+
+  
+  whiptail --backtitle "Proxmox VE Helper Scripts" --msgbox --title "Here is an instructional tip:" "To make a selection, use the Spacebar." 8 58
+  whiptail --backtitle "Proxmox VE Helper Scripts" --msgbox --title "Default distribution for $APP" "${var_os} ${var_version} \n \nIf the default Linux distribution is not adhered to, script support will be discontinued. \n" 10 58
+ 
+
+  CONFIG_FILE="/opt/community-scripts/.settings"
+  if CONFIG_FILE=$(whiptail --backtitle "Proxmox VE Helper Scripts" --inputbox "Set absolute path to config file" 8 58 $CONFIG_FILE --title "CONFIG FILE" 3>&1 1>&2 2>&3); then
+    if [[ ! -f "$CONFIG_FILE" ]]; then
+      echo -e "${CROSS}${RD} Config file not found, using the default values.${CL}"
+      base_settings
+
+    else
+      echo -e "${INFO}${BOLD}${DGN}Using config File: ${BGN}$CONFIG_FILE${CL}"
+      base_settings
+      source "$CONFIG_FILE"
+    fi
+  fi
+
+  if [[ "$var_os" == "debian" ]]; then
+    echo -e "${OS}${BOLD}${DGN}Operating System: ${BGN}$var_os${CL}"
+    if [[ "$var_version" == "11" ]]; then
+      echo -e "${OSVERSION}${BOLD}${DGN}Version: ${BGN}$var_version${CL}"
+    elif [[ "$var_version" == "12" ]]; then
+      echo -e "${OSVERSION}${BOLD}${DGN}Version: ${BGN}$var_version${CL}"
+    else
+      msg_error "Unknown setting for var_version, should be 11 or 12, was ${var_version}"
+      exit_script
+    fi
+  elif [[ "$var_os" == "ubuntu" ]]; then
+    echo -e "${OS}${BOLD}${DGN}Operating System: ${BGN}$var_os${CL}"
+    if [[ "$var_version" == "20.04" ]]; then
+      echo -e "${OSVERSION}${BOLD}${DGN}Version: ${BGN}$var_version${CL}"
+    elif [[ "$var_version" == "22.04" ]]; then
+      echo -e "${OSVERSION}${BOLD}${DGN}Version: ${BGN}$var_version${CL}"
+    elif [[ "$var_version" == "24.04" ]]; then
+      echo -e "${OSVERSION}${BOLD}${DGN}Version: ${BGN}$var_version${CL}"
+    elif [[ "$var_version" == "24.10" ]]; then
+      echo -e "${OSVERSION}${BOLD}${DGN}Version: ${BGN}$var_version${CL}"
+    else
+      msg_error "Unknown setting for var_version, should be 20.04, 22.04, 24.04 or 24.10, was ${var_version}"
+      exit_script
+    fi
+  else
+    msg_error "Unknown setting for var_os, should be debian or ubuntu, was ${var_os}"
+    exit_script
+  fi
+
+  if [[ "$CT_TYPE" -eq 0 ]]; then
+    CT_TYPE_DESC="Privileged"
+  elif [[ "$CT_TYPE" -eq 1 ]]; then
+    CT_TYPE_DESC="Unprivileged"  
+  else
+    msg_error "Unknown setting for CT_TYPE, should be 1 or 0, was ${CT_TYPE}"
+    exit_script
+  fi
+  echo -e "${CONTAINERTYPE}${BOLD}${DGN}Container Type: ${BGN}$CT_TYPE_DESC${CL}"
+
+  if [[ ! -z "$PW" ]]; then
+    
+    if [[ "$PW" == *" "* ]]; then
+      msg_error "Password cannot be empty"
+      exit_script
+    elif [[ ${#PW} -lt 5 ]]; then
+      msg_error "Password must be at least 5 characters long"
+      exit_script
+    else
+      echo -e "${VERIFYPW}${BOLD}${DGN}Root Password: ${BGN}********${CL}"
+    fi
+    PW="-password $PW"
+  else
+    PW=""
+    echo -e "${VERIFYPW}${BOLD}${DGN}Root Password: ${BGN}Automatic Login${CL}"
+  fi
+  echo -e "${CONTAINERID}${BOLD}${DGN}Container ID: ${BGN}$CT_ID${CL}"
+
+  if [[ ! -z "$HN" ]]; then
+    echo -e "${HOSTNAME}${BOLD}${DGN}Hostname: ${BGN}$HN${CL}"
+  else
+    msg_error "Hostname cannot be empty"
+    exit_script
+  fi
+
+  if [[ ! -z "$DISK_SIZE" ]]; then
+    echo -e "${DISKSIZE}${BOLD}${DGN}Disk Size: ${BGN}${DISK_SIZE} GB${CL}"
+  else
+    msg_error "Disk Size cannot be empty"
+    exit_script
+  fi
+
+  if [[ ! -z "$CORE_COUNT" ]]; then
+    echo -e "${CPUCORE}${BOLD}${DGN}CPU Cores: ${BGN}${CORE_COUNT}${CL}"
+  else
+    msg_error "CPU Cores cannot be empty"
+    exit_script
+  fi
+
+  if [[ ! -z "$RAM_SIZE" ]]; then
+    echo -e "${RAMSIZE}${BOLD}${DGN}RAM Size: ${BGN}${RAM_SIZE} MiB${CL}"
+  else
+    msg_error "RAM Size cannot be empty"
+    exit_script
+  fi
+
+  if [[ ! -z "$BRG" ]]; then
+    echo -e "${BRIDGE}${BOLD}${DGN}Bridge: ${BGN}$BRG${CL}"
+  else
+    msg_error "Bridge cannot be empty"
+    exit_script
+  fi
+
+ 
+  local ip_cidr_regex='^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})/([0-9]{1,2})$'
+  local ip_regex='^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$'
+
+  if [[ ! -z $NET ]]; then
+    if [ "$NET" == "dhcp" ]; then
+      echo -e "${NETWORK}${BOLD}${DGN}IP Address: ${BGN}DHCP${CL}"
+      echo -e "${GATEWAY}${BOLD}${DGN}Gateway IP Address: ${BGN}Default${CL}"
+    elif
+      [[ "$NET" =~ $ip_cidr_regex ]]; then
+      echo -e "${NETWORK}${BOLD}${DGN}IP Address: ${BGN}$NET${CL}"
+      if [ ! -z "$GATE" ]; then
+        if [[ "$GATE" =~ $ip_regex ]]; then
+          echo -e "${GATEWAY}${BOLD}${DGN}Gateway IP Address: ${BGN}$GATE${CL}"
+           GATE=",gw=$GATE"
+        else
+          msg_error "Invalid IP Address format for Gateway: ${GATE}"
+          exit_script
+        fi
+      else
+        msg_error "Gateway IP Address cannot be empty"
+        exit_script
+      fi
+    else
+      msg_error "Invalid IP Address format: ${NET}"
+      exit_script
+    fi
+  fi
+  
+
+  if [[ ! -z "$APT_CACHER_IP" ]]; then
+    if [[ "$APT_CACHER_IP" =~ $ip_regex ]]; then
+          APT_CACHER="${APT_CACHER_IP:+yes}"
+          echo -e "${GATEWAY}${BOLD}${DGN}Gateway IP Address: ${BGN}$APT_CAHER_IP${CL}"
+        else
+          msg_error "Invalid IP Address format for APT-Cacher: ${APT_CAHER_IP}"
+          exit_script
+        fi
+  fi
+
+  if [[ "$DISABLEIP6" == "yes" ]]; then
+    echo -e "${DISABLEIPV6}${BOLD}${DGN}Disable IPv6: ${BGN}Yes${CL}"
+  elif [[ "$DISABLEIP6" == "no" ]]; then
+    echo -e "${DISABLEIPV6}${BOLD}${DGN}Disable IPv6: ${BGN}No${CL}"
+  else
+    msg_error "Disable IPv6 needs to be 'yes' or 'no'"
+    exit_script
+  fi
+
+  if [[ ! -z "$MTU" ]]; then
+    echo -e "${DEFAULT}${BOLD}${DGN}Interface MTU Size: ${BGN}$MTU${CL}"
+  else
+    MTU=""
+    echo -e "${DEFAULT}${BOLD}${DGN}Interface MTU Size: ${BGN}Default${CL}"
+    
+  fi
+
+  if [[ ! -z "$SD" ]]; then
+    echo -e "${SEARCH}${BOLD}${DGN}DNS Search Domain: ${BGN}$SD${CL}"
+    SD="-searchdomain=$SD"
+  else
+    SD=""
+    echo -e "${SEARCH}${BOLD}${DGN}DNS Search Domain: ${BGN}HOST${CL}"
+  fi
+
+
+  if [[ ! -z "$NS" ]]; then
+    echo -e "${NETWORK}${BOLD}${DGN}DNS Server IP Address: ${BGN}$NS${CL}"
+    NS="-nameserver=$NS"
+  else
+    NS=""
+    echo -e "${NETWORK}${BOLD}${DGN}DNS Server IP Address: ${BGN}HOST${CL}"
+  fi
+
+  if [[ ! -z "$MAC" ]]; then
+    echo -e "${MACADDRESS}${BOLD}${DGN}MAC Address: ${BGN}$MAC${CL}"
+    AC=",hwaddr=$MAC"
+  fi
+
+  if [[ ! -z "$VLAN" ]]; then
+    echo -e "${VLANTAG}${BOLD}${DGN}Vlan: ${BGN}$VLAN${CL}"
+    VLAN=",tag=$VLAN"
+  fi
+
+  if [[ ! -z "$TAGS" ]]; then
+    echo -e "${NETWORK}${BOLD}${DGN}Tags: ${BGN}$TAGS${CL}"
+  fi
+
+  if [[ "$SSH" == "yes" ]]; then
+    echo -e "${ROOTSSH}${BOLD}${DGN}Root SSH Access: ${BGN}$SSH${CL}"
+    if [[ ! -z "$SSH_AUTHORIZED_KEY" ]]; then
+      echo -e "${ROOTSSH}${BOLD}${DGN}SSH Authorized Key: ${BGN}********************${CL}"
+    else
+      echo -e "${ROOTSSH}${BOLD}${DGN}SSH Authorized Key: ${BGN}None${CL}"
+    fi
+  elif [[ "$SSH" == "no" ]]; then
+    echo -e "${ROOTSSH}${BOLD}${DGN}Root SSH Access: ${BGN}$SSH${CL}"
+  else
+    msg_error "SSH needs to be 'yes' or 'no'"
+    exit_script
+  fi
+
+  if [[ "$VERB" == "yes" ]]; then
+    echo -e "${SEARCH}${BOLD}${DGN}Verbose Mode: ${BGN}$VERB${CL}"
+  elif [[ "$VERB" == "no" ]]; then
+    echo -e "${SEARCH}${BOLD}${DGN}Verbose Mode: ${BGN}No${CL}"
+  else
+    msg_error "Verbose Mode needs to be 'yes' or 'no'"
+    exit_script
+  fi
+
+  if (whiptail --backtitle "Proxmox VE Helper Scripts" --title "ADVANCED SETTINGS WITH CONFIG FILE COMPLETE" --yesno "Ready to create ${APP} LXC?" 10 58); then
+    echo -e "${CREATING}${BOLD}${RD}Creating a ${APP} LXC using the above settings${CL}"
+  else
+    clear
+    header_info
+    echo -e "${INFO}${HOLD} ${GN}Using Config File on node $PVEHOST_NAME${CL}"
+    config_file
+  fi
+
+}
+
 install_script() {
   pve_check
   shell_check
@@ -700,7 +934,8 @@ install_script() {
       "1" "Default Settings" \
       "2" "Default Settings (with verbose)" \
       "3" "Advanced Settings" \
-      "4" "Exit" --nocancel --default-item "1" 3>&1 1>&2 2>&3)
+      "4" "Use Config File" \
+      "5" "Exit" --nocancel --default-item "1" 3>&1 1>&2 2>&3)
 
     if [ $? -ne 0 ]; then
       echo -e "${CROSS}${RD} Menu canceled. Exiting.${CL}"
@@ -731,6 +966,12 @@ install_script() {
         break
         ;;
       4)
+        header_info
+        echo -e "${INFO}${HOLD} ${GN}Using Config File on node $PVEHOST_NAME${CL}"
+        config_file
+        break
+        ;;
+      5)
         echo -e "${CROSS}${RD}Exiting.${CL}"
         exit 0
         ;;
@@ -814,9 +1055,9 @@ build_container() {
   TEMP_DIR=$(mktemp -d)
   pushd $TEMP_DIR >/dev/null
   if [ "$var_os" == "alpine" ]; then
-    export FUNCTIONS_FILE_PATH="$(curl -s https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/misc/alpine-install.func)"
+    export FUNCTIONS_FILE_PATH="$(curl -s https://raw.githubusercontent.com/community-scripts/ProxmoxVE/config_file/misc/alpine-install.func)"
   else
-    export FUNCTIONS_FILE_PATH="$(curl -s https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/misc/install.func)"
+    export FUNCTIONS_FILE_PATH="$(curl -s https://raw.githubusercontent.com/community-scripts/ProxmoxVE/config_file/misc/install.func)"
   fi
   export CACHER="$APT_CACHER"
   export CACHER_IP="$APT_CACHER_IP"
@@ -847,7 +1088,7 @@ build_container() {
     $PW
   "
   # This executes create_lxc.sh and creates the container and .conf file
-  bash -c "$(wget -qLO - https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/ct/create_lxc.sh)" || exit
+  bash -c "$(wget -qLO - https://raw.githubusercontent.com/community-scripts/ProxmoxVE/config_file/ct/create_lxc.sh)" || exit
 
   LXC_CONFIG=/etc/pve/lxc/${CTID}.conf
   if [ "$CT_TYPE" == "0" ]; then
@@ -909,7 +1150,7 @@ http://dl-cdn.alpinelinux.org/alpine/latest-stable/community
 EOF'
     pct exec "$CTID" -- ash -c "apk add bash >/dev/null"
   fi
-  lxc-attach -n "$CTID" -- bash -c "$(wget -qLO - https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/install/$var_install.sh)" || exit
+  lxc-attach -n "$CTID" -- bash -c "$(wget -qLO - https://raw.githubusercontent.com/community-scripts/ProxmoxVE/config_file/install/$var_install.sh)" || exit
 
 }
 
@@ -921,7 +1162,7 @@ description() {
   DESCRIPTION=$(cat <<EOF
 <div align='center'>
   <a href='https://Helper-Scripts.com' target='_blank' rel='noopener noreferrer'>
-    <img src='https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/misc/images/logo-81x112.png' alt='Logo' style='width:81px;height:112px;'/>
+    <img src='https://raw.githubusercontent.com/community-scripts/ProxmoxVE/config_file/misc/images/logo-81x112.png' alt='Logo' style='width:81px;height:112px;'/>
   </a>
 
   <h2 style='font-size: 24px; margin: 20px 0;'>${APP} LXC</h2>
