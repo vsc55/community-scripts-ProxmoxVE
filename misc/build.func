@@ -504,13 +504,7 @@ advanced_settings() {
       BRG="vmbr0"
       echo -e "${BRIDGE}${BOLD}${DGN}Bridge: ${BGN}$BRG${CL}"
     else
-      if grep -q "^iface ${BRG}" /etc/network/interfaces; then
-        echo -e "${BRIDGE}${BOLD}${DGN}Bridge: ${BGN}$BRG${CL}"
-      else
-        msg_error "Bridge does not exist in /etc/network/interfaces"
-        exit
-      fi
-      
+      echo -e "${BRIDGE}${BOLD}${DGN}Bridge: ${BGN}$BRG${CL}"
     fi
   else
     exit_script
@@ -792,7 +786,12 @@ config_file(){
   fi
 
   if [[ ! -z "$BRG" ]]; then
-    echo -e "${BRIDGE}${BOLD}${DGN}Bridge: ${BGN}$BRG${CL}"
+    if grep -q "^iface ${BRG}" /etc/network/interfaces; then
+      echo -e "${BRIDGE}${BOLD}${DGN}Bridge: ${BGN}$BRG${CL}"
+    else
+      msg_error "Bridge does not exist in /etc/network/interfaces"
+      exit
+    fi
   else
     msg_error "Bridge cannot be empty"
     exit
