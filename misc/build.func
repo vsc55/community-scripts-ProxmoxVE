@@ -862,7 +862,12 @@ config_file(){
   fi
 
   if [[ ! -z "$MTU" ]]; then
-    echo -e "${DEFAULT}${BOLD}${DGN}Interface MTU Size: ${BGN}$MTU${CL}"
+    if [[ "$MTU" =~ ^-?[0-9]+$ ]]; then
+      echo -e "${DEFAULT}${BOLD}${DGN}Interface MTU Size: ${BGN}$MTU${CL}"
+    else
+      msg_error "MTU must be an integer"
+      exit
+    fi
   else
     MTU=""
     echo -e "${DEFAULT}${BOLD}${DGN}Interface MTU Size: ${BGN}Default${CL}"
