@@ -768,7 +768,7 @@ config_file(){
     if  [[ "$DISK_SIZE" =~ ^-?[0-9]+$ ]]; then
       echo -e "${DISKSIZE}${BOLD}${DGN}Disk Size: ${BGN}${DISK_SIZE} GB${CL}"
     else
-      msg_error "DISK_SIZE must be an integer"
+      msg_error "DISK_SIZE must be an integer, was ${DISK_SIZE}"
       exit
     fi
   else
@@ -780,7 +780,7 @@ config_file(){
     if  [[ "$CORE_COUNT" =~ ^-?[0-9]+$ ]]; then
       echo -e "${CPUCORE}${BOLD}${DGN}CPU Cores: ${BGN}${CORE_COUNT}${CL}"
     else
-      msg_error "CORE_COUNT must be an integer"
+      msg_error "CORE_COUNT must be an integer, was ${CORE_COUNT}"
       exit
     fi    
   else
@@ -792,7 +792,7 @@ config_file(){
     if  [[ "$RAM_SIZE" =~ ^-?[0-9]+$ ]]; then
       echo -e "${RAMSIZE}${BOLD}${DGN}RAM Size: ${BGN}${RAM_SIZE} MiB${CL}"
     else
-      msg_error "RAM_SIZE must be an integer"
+      msg_error "RAM_SIZE must be an integer, was ${RAM_SIZE}"
       exit
     fi        
   else
@@ -804,7 +804,7 @@ config_file(){
     if grep -q "^iface ${BRG}" /etc/network/interfaces; then
       echo -e "${BRIDGE}${BOLD}${DGN}Bridge: ${BGN}$BRG${CL}"
     else
-      msg_error "Bridge does not exist in /etc/network/interfaces"
+      msg_error "Bridge '${BRG}' does not exist in /etc/network/interfaces"
       exit
     fi
   else
@@ -828,7 +828,7 @@ config_file(){
           echo -e "${GATEWAY}${BOLD}${DGN}Gateway IP Address: ${BGN}$GATE${CL}"
            GATE=",gw=$GATE"
         else
-          msg_error "Invalid IP Address format for Gateway: ${GATE}"
+          msg_error "Invalid IP Address format for Gateway. Needs to be 0.0.0.0, was ${GATE}"
           exit
         fi
       else
@@ -836,7 +836,7 @@ config_file(){
         exit
       fi
     else
-      msg_error "Invalid IP Address format: ${NET}"
+      msg_error "Invalid IP Address format. Needs to be 0.0.0.0/0, was ${NET}"
       exit
     fi
   fi
@@ -844,10 +844,10 @@ config_file(){
 
   if [[ ! -z "$APT_CACHER_IP" ]]; then
     if [[ "$APT_CACHER_IP" =~ $ip_regex ]]; then
-          APT_CACHER="${APT_CACHER_IP:+yes}"
-          echo -e "${GATEWAY}${BOLD}${DGN}Gateway IP Address: ${BGN}$APT_CAHER_IP${CL}"
+          APT_CACHER="yes"
+          echo -e "${GATEWAY}${BOLD}${DGN}Gateway IP Address: ${BGN}$APT_CACHER_IP${CL}"
         else
-          msg_error "Invalid IP Address format for APT-Cacher: ${APT_CAHER_IP}"
+          msg_error "Invalid IP Address format for APT-Cacher. Needs to be 0.0.0.0, was ${APT_CACHER_IP}"
           exit
         fi
   fi
@@ -864,8 +864,9 @@ config_file(){
   if [[ ! -z "$MTU" ]]; then
     if [[ "$MTU" =~ ^-?[0-9]+$ ]]; then
       echo -e "${DEFAULT}${BOLD}${DGN}Interface MTU Size: ${BGN}$MTU${CL}"
+      MTU=",mtu=$MTU"
     else
-      msg_error "MTU must be an integer"
+      msg_error "MTU must be an integer, was ${MTU}"
       exit
     fi
   else
@@ -888,7 +889,7 @@ config_file(){
         echo -e "${NETWORK}${BOLD}${DGN}DNS Server IP Address: ${BGN}$NS${CL}"
         NS="-nameserver=$NS"
       else
-        msg_error "Invalid IP Address format for Name Server: ${NS}"
+        msg_error "Invalid IP Address format for DNS Server. Needs to be 0.0.0.0, was ${NS}"
         exit
       fi   
   else
@@ -897,8 +898,13 @@ config_file(){
   fi
 
   if [[ ! -z "$MAC" ]]; then
-    echo -e "${MACADDRESS}${BOLD}${DGN}MAC Address: ${BGN}$MAC${CL}"
-    AC=",hwaddr=$MAC"
+    if  [[ "$MAC" =~ ^([A-Fa-f0-9]{2}:){5}[A-Fa-f0-9]{2}$ ]]; then
+      echo -e "${MACADDRESS}${BOLD}${DGN}MAC Address: ${BGN}$MAC${CL}"
+      MAC=",hwaddr=$MAC"
+    else
+      msg_error "MAC Address must be in the format xx:xx:xx:xx:xx:xx, was ${MAC}"
+      exit
+    fi
   fi
 
   if [[ ! -z "$VLAN" ]]; then
@@ -906,7 +912,7 @@ config_file(){
       echo -e "${VLANTAG}${BOLD}${DGN}Vlan: ${BGN}$VLAN${CL}"
       VLAN=",tag=$VLAN"
     else
-      msg_error "VLAN must be an integer"
+      msg_error "VLAN must be an integer, was ${VLAN}"
       exit
     fi
   fi
@@ -925,7 +931,7 @@ config_file(){
   elif [[ "$SSH" == "no" ]]; then
     echo -e "${ROOTSSH}${BOLD}${DGN}Root SSH Access: ${BGN}$SSH${CL}"
   else
-    msg_error "SSH needs to be 'yes' or 'no'"
+    msg_error "SSH needs to be 'yes' or 'no', was ${SSH}"
     exit
   fi
 
@@ -934,7 +940,7 @@ config_file(){
   elif [[ "$VERB" == "no" ]]; then
     echo -e "${SEARCH}${BOLD}${DGN}Verbose Mode: ${BGN}No${CL}"
   else
-    msg_error "Verbose Mode needs to be 'yes' or 'no'"
+    msg_error "Verbose Mode needs to be 'yes' or 'no', was ${VERB}"
     exit
   fi
 
