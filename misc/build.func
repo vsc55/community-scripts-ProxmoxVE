@@ -765,23 +765,38 @@ config_file(){
   fi
 
   if [[ ! -z "$DISK_SIZE" ]]; then
-    echo -e "${DISKSIZE}${BOLD}${DGN}Disk Size: ${BGN}${DISK_SIZE} GB${CL}"
+    if  [[ "$DISK_SIZE" =~ ^-?[0-9]+$ ]]; then
+      echo -e "${DISKSIZE}${BOLD}${DGN}Disk Size: ${BGN}${DISK_SIZE} GB${CL}"
+    else
+      msg_error "DISK_SIZE must be an integer"
+      exit
+    fi
   else
-    msg_error "Disk Size cannot be empty"
+    msg_error "DISK_SIZE cannot be empty"
     exit
   fi
 
   if [[ ! -z "$CORE_COUNT" ]]; then
-    echo -e "${CPUCORE}${BOLD}${DGN}CPU Cores: ${BGN}${CORE_COUNT}${CL}"
+    if  [[ "$CORE_COUNT" =~ ^-?[0-9]+$ ]]; then
+      echo -e "${CPUCORE}${BOLD}${DGN}CPU Cores: ${BGN}${CORE_COUNT}${CL}"
+    else
+      msg_error "CORE_COUNT must be an integer"
+      exit
+    fi    
   else
-    msg_error "CPU Cores cannot be empty"
+    msg_error "CORE_COUNT cannot be empty"
     exit
   fi
 
   if [[ ! -z "$RAM_SIZE" ]]; then
-    echo -e "${RAMSIZE}${BOLD}${DGN}RAM Size: ${BGN}${RAM_SIZE} MiB${CL}"
+    if  [[ "$RAM_SIZE" =~ ^-?[0-9]+$ ]]; then
+      echo -e "${RAMSIZE}${BOLD}${DGN}RAM Size: ${BGN}${RAM_SIZE} MiB${CL}"
+    else
+      msg_error "RAM_SIZE must be an integer"
+      exit
+    fi        
   else
-    msg_error "RAM Size cannot be empty"
+    msg_error "RAM_SIZE cannot be empty"
     exit
   fi
 
@@ -864,8 +879,13 @@ config_file(){
 
 
   if [[ ! -z "$NS" ]]; then
-    echo -e "${NETWORK}${BOLD}${DGN}DNS Server IP Address: ${BGN}$NS${CL}"
-    NS="-nameserver=$NS"
+     if [[ "$NS" =~ $ip_regex ]]; then
+        echo -e "${NETWORK}${BOLD}${DGN}DNS Server IP Address: ${BGN}$NS${CL}"
+        NS="-nameserver=$NS"
+      else
+        msg_error "Invalid IP Address format for Name Server: ${NS}"
+        exit
+      fi   
   else
     NS=""
     echo -e "${NETWORK}${BOLD}${DGN}DNS Server IP Address: ${BGN}HOST${CL}"
@@ -877,8 +897,13 @@ config_file(){
   fi
 
   if [[ ! -z "$VLAN" ]]; then
-    echo -e "${VLANTAG}${BOLD}${DGN}Vlan: ${BGN}$VLAN${CL}"
-    VLAN=",tag=$VLAN"
+    if [[ "$VLAN" =~ ^-?[0-9]+$ ]]; then
+      echo -e "${VLANTAG}${BOLD}${DGN}Vlan: ${BGN}$VLAN${CL}"
+      VLAN=",tag=$VLAN"
+    else
+      msg_error "VLAN must be an integer"
+      exit
+    fi
   fi
 
   if [[ ! -z "$TAGS" ]]; then
