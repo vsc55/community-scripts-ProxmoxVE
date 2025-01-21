@@ -1,6 +1,7 @@
 # Copyright (c) 2021-2025 tteck
 # Author: tteck (tteckster)
 # Co-Author: MickLesk
+# Co-Author: Michel Roegl-Brunner
 # License: MIT
 # https://github.com/community-scripts/ProxmoxVE/raw/main/LICENSE
 
@@ -503,7 +504,13 @@ advanced_settings() {
       BRG="vmbr0"
       echo -e "${BRIDGE}${BOLD}${DGN}Bridge: ${BGN}$BRG${CL}"
     else
-      echo -e "${BRIDGE}${BOLD}${DGN}Bridge: ${BGN}$BRG${CL}"
+      if grep -q "^iface ${BRG}" /etc/network/interfaces; then
+        echo -e "${BRIDGE}${BOLD}${DGN}Bridge: ${BGN}$BRG${CL}"
+      else
+        msg_error "Bridge does not exist in /etc/network/interfaces"
+        exit
+      fi
+      
     fi
   else
     exit_script
@@ -689,7 +696,7 @@ config_file(){
   CONFIG_FILE="/opt/community-scripts/.settings"
   if CONFIG_FILE=$(whiptail --backtitle "Proxmox VE Helper Scripts" --inputbox "Set absolute path to config file" 8 58 $CONFIG_FILE --title "CONFIG FILE" 3>&1 1>&2 2>&3); then
     if [[ ! -f "$CONFIG_FILE" ]]; then
-      echo -e "${CROSS}${RD} Config file not found, using the default values.${CL}"
+      echo -e "${CROSS}${RD}Config file not found, using the default values.${CL}"
       base_settings
 
     else
@@ -724,7 +731,7 @@ config_file(){
       exit
     fi
   else
-    msg_error "Unknown setting for var_os, should be debian or ubuntu, was ${var_os}"
+    msg_error "Unknown setting for var_os! should be debian or ubuntu, was ${var_os}"
     exit
   fi
 
@@ -928,7 +935,7 @@ install_script() {
   header_info
   while true; do
     CHOICE=$(whiptail --backtitle "Proxmox VE Helper Scripts" --title "SETTINGS" --menu "Choose an option:" \
-      16 50 5 \
+      12 50 5 \
       "1" "Default Settings" \
       "2" "Default Settings (with verbose)" \
       "3" "Advanced Settings" \
