@@ -845,7 +845,7 @@ config_file(){
   if [[ ! -z "$APT_CACHER_IP" ]]; then
     if [[ "$APT_CACHER_IP" =~ $ip_regex ]]; then
           APT_CACHER="yes"
-          echo -e "${GATEWAY}${BOLD}${DGN}Gateway IP Address: ${BGN}$APT_CACHER_IP${CL}"
+          echo -e "${NETWORK}${BOLD}${DGN}APT-CACHER IP Address: ${BGN}$APT_CACHER_IP${CL}"
         else
           msg_error "Invalid IP Address format for APT-Cacher. Needs to be 0.0.0.0, was ${APT_CACHER_IP}"
           exit
