@@ -682,12 +682,10 @@ advanced_settings() {
 }
 
 config_file(){
-
   
   whiptail --backtitle "Proxmox VE Helper Scripts" --msgbox --title "Here is an instructional tip:" "To make a selection, use the Spacebar." 8 58
   whiptail --backtitle "Proxmox VE Helper Scripts" --msgbox --title "Default distribution for $APP" "${var_os} ${var_version} \n \nIf the default Linux distribution is not adhered to, script support will be discontinued. \n" 10 58
  
-
   CONFIG_FILE="/opt/community-scripts/.settings"
   if CONFIG_FILE=$(whiptail --backtitle "Proxmox VE Helper Scripts" --inputbox "Set absolute path to config file" 8 58 $CONFIG_FILE --title "CONFIG FILE" 3>&1 1>&2 2>&3); then
     if [[ ! -f "$CONFIG_FILE" ]]; then
@@ -709,7 +707,7 @@ config_file(){
       echo -e "${OSVERSION}${BOLD}${DGN}Version: ${BGN}$var_version${CL}"
     else
       msg_error "Unknown setting for var_version, should be 11 or 12, was ${var_version}"
-      exit_script
+      exit
     fi
   elif [[ "$var_os" == "ubuntu" ]]; then
     echo -e "${OS}${BOLD}${DGN}Operating System: ${BGN}$var_os${CL}"
@@ -723,11 +721,11 @@ config_file(){
       echo -e "${OSVERSION}${BOLD}${DGN}Version: ${BGN}$var_version${CL}"
     else
       msg_error "Unknown setting for var_version, should be 20.04, 22.04, 24.04 or 24.10, was ${var_version}"
-      exit_script
+      exit
     fi
   else
     msg_error "Unknown setting for var_os, should be debian or ubuntu, was ${var_os}"
-    exit_script
+    exit
   fi
 
   if [[ "$CT_TYPE" -eq 0 ]]; then
@@ -736,7 +734,7 @@ config_file(){
     CT_TYPE_DESC="Unprivileged"  
   else
     msg_error "Unknown setting for CT_TYPE, should be 1 or 0, was ${CT_TYPE}"
-    exit_script
+    exit
   fi
   echo -e "${CONTAINERTYPE}${BOLD}${DGN}Container Type: ${BGN}$CT_TYPE_DESC${CL}"
 
@@ -744,10 +742,10 @@ config_file(){
     
     if [[ "$PW" == *" "* ]]; then
       msg_error "Password cannot be empty"
-      exit_script
+      exit
     elif [[ ${#PW} -lt 5 ]]; then
       msg_error "Password must be at least 5 characters long"
-      exit_script
+      exit
     else
       echo -e "${VERIFYPW}${BOLD}${DGN}Root Password: ${BGN}********${CL}"
     fi
@@ -762,35 +760,35 @@ config_file(){
     echo -e "${HOSTNAME}${BOLD}${DGN}Hostname: ${BGN}$HN${CL}"
   else
     msg_error "Hostname cannot be empty"
-    exit_script
+    exit
   fi
 
   if [[ ! -z "$DISK_SIZE" ]]; then
     echo -e "${DISKSIZE}${BOLD}${DGN}Disk Size: ${BGN}${DISK_SIZE} GB${CL}"
   else
     msg_error "Disk Size cannot be empty"
-    exit_script
+    exit
   fi
 
   if [[ ! -z "$CORE_COUNT" ]]; then
     echo -e "${CPUCORE}${BOLD}${DGN}CPU Cores: ${BGN}${CORE_COUNT}${CL}"
   else
     msg_error "CPU Cores cannot be empty"
-    exit_script
+    exit
   fi
 
   if [[ ! -z "$RAM_SIZE" ]]; then
     echo -e "${RAMSIZE}${BOLD}${DGN}RAM Size: ${BGN}${RAM_SIZE} MiB${CL}"
   else
     msg_error "RAM Size cannot be empty"
-    exit_script
+    exit
   fi
 
   if [[ ! -z "$BRG" ]]; then
     echo -e "${BRIDGE}${BOLD}${DGN}Bridge: ${BGN}$BRG${CL}"
   else
     msg_error "Bridge cannot be empty"
-    exit_script
+    exit
   fi
 
  
@@ -810,15 +808,15 @@ config_file(){
            GATE=",gw=$GATE"
         else
           msg_error "Invalid IP Address format for Gateway: ${GATE}"
-          exit_script
+          exit
         fi
       else
         msg_error "Gateway IP Address cannot be empty"
-        exit_script
+        exit
       fi
     else
       msg_error "Invalid IP Address format: ${NET}"
-      exit_script
+      exit
     fi
   fi
   
@@ -829,7 +827,7 @@ config_file(){
           echo -e "${GATEWAY}${BOLD}${DGN}Gateway IP Address: ${BGN}$APT_CAHER_IP${CL}"
         else
           msg_error "Invalid IP Address format for APT-Cacher: ${APT_CAHER_IP}"
-          exit_script
+          exit
         fi
   fi
 
@@ -839,7 +837,7 @@ config_file(){
     echo -e "${DISABLEIPV6}${BOLD}${DGN}Disable IPv6: ${BGN}No${CL}"
   else
     msg_error "Disable IPv6 needs to be 'yes' or 'no'"
-    exit_script
+    exit
   fi
 
   if [[ ! -z "$MTU" ]]; then
@@ -892,7 +890,7 @@ config_file(){
     echo -e "${ROOTSSH}${BOLD}${DGN}Root SSH Access: ${BGN}$SSH${CL}"
   else
     msg_error "SSH needs to be 'yes' or 'no'"
-    exit_script
+    exit
   fi
 
   if [[ "$VERB" == "yes" ]]; then
@@ -901,7 +899,7 @@ config_file(){
     echo -e "${SEARCH}${BOLD}${DGN}Verbose Mode: ${BGN}No${CL}"
   else
     msg_error "Verbose Mode needs to be 'yes' or 'no'"
-    exit_script
+    exit
   fi
 
   if (whiptail --backtitle "Proxmox VE Helper Scripts" --title "ADVANCED SETTINGS WITH CONFIG FILE COMPLETE" --yesno "Ready to create ${APP} LXC?" 10 58); then
@@ -930,7 +928,7 @@ install_script() {
   header_info
   while true; do
     CHOICE=$(whiptail --backtitle "Proxmox VE Helper Scripts" --title "SETTINGS" --menu "Choose an option:" \
-      12 50 4 \
+      16 50 4 \
       "1" "Default Settings" \
       "2" "Default Settings (with verbose)" \
       "3" "Advanced Settings" \
