@@ -734,8 +734,7 @@ config_file(){
   fi
 
   if [[ ! -z "$CT_ID" ]]; then
-    if [[ "$CT_ID" =~ ^[0-9]{3,4}-[0-9]{3,4}$ ]]; then
-
+    if [[ "$CT_ID" =~ ^([0-9]{3,4})-([0-9]{3,4})$ ]]; then
       MIN_ID=${BASH_REMATCH[1]}
       MAX_ID=${BASH_REMATCH[2]}
 
