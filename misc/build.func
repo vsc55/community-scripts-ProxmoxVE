@@ -695,9 +695,8 @@ config_file(){
 
   if CONFIG_FILE=$(whiptail --backtitle "Proxmox VE Helper Scripts" --inputbox "Set absolute path to config file" 8 58 $CONFIG_FILE --title "CONFIG FILE" 3>&1 1>&2 2>&3); then
     if [[ ! -f "$CONFIG_FILE" ]]; then
-      echo -e "${CROSS}${RD}Config file not found, using the default values.${CL}"
-      base_settings
-
+      echo -e "${CROSS}${RD}Config file not found, exiting script!.${CL}"
+      exit
     else
       echo -e "${INFO}${BOLD}${DGN}Using config File: ${BGN}$CONFIG_FILE${CL}"
       base_settings
@@ -732,6 +731,38 @@ config_file(){
   else
     msg_error "Unknown setting for var_os! should be debian or ubuntu, was ${var_os}"
     exit
+  fi
+
+  if [[ ! -z "$CT_ID" ]]; then
+    if [[ "$CT_ID" =~ ^[0-9]{4}-[0-9]{4}$ ]]; then
+
+      MIN_ID=${BASH_REMATCH[1]}
+      MAX_ID=${BASH_REMATCH[2]}
+
+      LIST_OF_IDS=$( pvesh get /cluster/resources --type vm --output-format json | jq '.[] .vmid' -r)
+
+      for ((ID=MIN_ID; ID<=MAX_ID; ID++)); do
+        if ! grep -q "^$ID$" <<< "$LIST_OF_IDS"; then
+          CT_ID=$ID
+          break
+        fi
+      done
+
+      echo -e "${CONTAINERID}${BOLD}${DGN}Container ID: ${BGN}$CT_ID${CL}"
+    elif [[ "$CT_ID" =~ ^[0-9]+$ ]]; then
+
+      LIST_OF_IDS=$( pvesh get /cluster/resources --type vm --output-format json | jq '.[] .vmid' -r)
+
+      if ! grep -q "^$CT_ID$" <<< "$LIST_OF_IDS"; then
+        echo -e "${CONTAINERID}${BOLD}${DGN}Container ID: ${BGN}$CT_ID${CL}"
+      else
+        msg_error "Container ID $CT_ID already exists"
+        exit
+      fi
+    else
+      msg_error "Invalid Container ID format. Needs to be 0000-9999 or 0-9999, was ${CT_ID}"
+      exit
+    fi
   fi
 
   if [[ "$CT_TYPE" -eq 0 ]]; then
