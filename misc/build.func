@@ -734,7 +734,7 @@ config_file(){
   fi
 
   if [[ ! -z "$CT_ID" ]]; then
-    if [[ "$CT_ID" =~ ^[0-9]{4}-[0-9]{4}$ ]]; then
+    if [[ "$CT_ID" =~ ^[0-9]{3,4}-[0-9]{3,4}$ ]]; then
 
       MIN_ID=${BASH_REMATCH[1]}
       MAX_ID=${BASH_REMATCH[2]}
@@ -749,10 +749,10 @@ config_file(){
       done
 
       echo -e "${CONTAINERID}${BOLD}${DGN}Container ID: ${BGN}$CT_ID${CL}"
+
     elif [[ "$CT_ID" =~ ^[0-9]+$ ]]; then
 
       LIST_OF_IDS=$( pvesh get /cluster/resources --type vm --output-format json | jq '.[] .vmid' -r)
-
       if ! grep -q "^$CT_ID$" <<< "$LIST_OF_IDS"; then
         echo -e "${CONTAINERID}${BOLD}${DGN}Container ID: ${BGN}$CT_ID${CL}"
       else
