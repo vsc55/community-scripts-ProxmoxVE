@@ -739,6 +739,11 @@ config_file(){
       MIN_ID=${BASH_REMATCH[1]}
       MAX_ID=${BASH_REMATCH[2]}
 
+       if (( MIN_ID >= MAX_ID )); then
+        msg_error "Invalid Container ID range. The first number must be smaller than the second number, was ${CT_ID}"
+        exit
+       fi
+
       LIST_OF_IDS=$( pvesh get /cluster/resources --type vm --output-format json | jq '.[] .vmid' -r)
 
       for ((ID=MIN_ID; ID<=MAX_ID; ID++)); do
@@ -747,7 +752,7 @@ config_file(){
           break
         fi
       done
-
+      
       echo -e "${CONTAINERID}${BOLD}${DGN}Container ID: ${BGN}$CT_ID${CL}"
 
     elif [[ "$CT_ID" =~ ^[0-9]+$ ]]; then
