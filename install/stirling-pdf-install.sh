@@ -40,12 +40,11 @@ $STD apt-get install -y \
   python3-uno
 msg_ok "Installed LibreOffice Components"
 
-msg_info "Installing Python Dependencies"
-$STD apt-get install -y \
-  python3 \
-  python3-pip
-rm -rf /usr/lib/python3.*/EXTERNALLY-MANAGED
-$STD pip3 install \
+PYTHON_VERSION="3.12" setup_uv
+
+msg_info "Installing Python Dependencies via uv"
+uv venv /opt/stirling/venv
+$STD /opt/stirling/venv/bin/uv pip install \
   uno \
   opencv-python-headless \
   unoconv \
