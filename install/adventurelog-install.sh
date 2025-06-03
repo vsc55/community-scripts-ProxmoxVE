@@ -18,12 +18,10 @@ msg_info "Installing Dependencies"
 $STD apt-get install -y \
   gdal-bin \
   libgdal-dev \
-  git \
-  python3-venv \
-  python3-pip
+  git
 msg_ok "Installed Dependencies"
 
-setup_uv
+PYTHON_VERSION="3.12" setup_uv
 NODE_VERSION="22" NODE_MODULE="pnpm@latest" install_node_and_modules
 PG_VERSION="16" PG_MODULES="postgis" install_postgresql
 
@@ -80,13 +78,12 @@ DISABLE_REGISTRATION=False
 EOF
 cd /opt/adventurelog/backend/server
 mkdir -p /opt/adventurelog/backend/server/media
-$STD uv venv /opt/adventurelog/backend/server/venv
-source /opt/adventurelog/backend/server/venv/bin/activate
+$STD uv venv --python $UV_PYTHON_VERSION /opt/adventurelog/backend/server/venv
 $STD uv pip install --upgrade pip
 $STD uv pip install -r requirements.txt
-$STD uv python3 manage.py collectstatic --noinput
-$STD uv python3 manage.py migrate
-$STD uv python3 manage.py download-countries
+$STD uv run python manage.py collectstatic --noinput
+$STD uv run python manage.py migrate
+$STD uv run python manage.py download-countries
 cat <<EOF >/opt/adventurelog/frontend/.env
 PUBLIC_SERVER_URL=http://$LOCAL_IP:8000
 BODY_SIZE_LIMIT=Infinity
@@ -99,7 +96,7 @@ echo "${RELEASE}" >"/opt/${APPLICATION}_version.txt"
 msg_ok "Installed AdventureLog"
 
 msg_info "Setting up Django Admin"
-$STD uv python3 /opt/adventurelog/backend/server/manage.py shell <<EOF
+$STD uv run python /opt/adventurelog/backend/server/manage.py shell <<EOF
 from django.contrib.auth import get_user_model
 UserModel = get_user_model()
 user = UserModel.objects.create_user('$DJANGO_ADMIN_USER', password='$DJANGO_ADMIN_PASS')
@@ -123,7 +120,7 @@ After=network.target postgresql.service
 
 [Service]
 WorkingDirectory=/opt/adventurelog/backend/server
-ExecStart=python3 manage.py runserver 0.0.0.0:8000
+ExecStart=/opt/adventurelog/backend/server/venv/bin/python manage.py runserver 0.0.0.0:8000
 Restart=always
 EnvironmentFile=/opt/adventurelog/backend/server/.env
 

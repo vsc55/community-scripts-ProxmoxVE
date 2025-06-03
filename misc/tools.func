@@ -1065,6 +1065,20 @@ function setup_uv() {
   # set path
   ensure_usr_local_bin_persist
   msg_ok "uv installed/updated to $LATEST_VERSION"
+
+  if [[ -n "$PYTHON_VERSION" ]]; then
+    $STD msg_info "Ensuring Python $PYTHON_VERSION is available via uv..."
+    if ! uv python list | grep -q "cpython-${PYTHON_VERSION}-linux"; then
+      msg_error "Python version $PYTHON_VERSION not available via uv"
+      return 1
+    fi
+    if ! uv python list | grep -q "cpython-${PYTHON_VERSION}-linux.*.local/share/uv/python"; then
+      $STD uv python install "$PYTHON_VERSION"
+      msg_ok "Installed Python $PYTHON_VERSION via uv"
+    else
+      $STD msg_ok "Python $PYTHON_VERSION already installed via uv"
+    fi
+  fi
 }
 
 # ------------------------------------------------------------------------------

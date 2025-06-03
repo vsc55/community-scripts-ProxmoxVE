@@ -19,7 +19,7 @@ $STD apt-get install -y \
   p7zip-full
 msg_ok "Installed Dependencies"
 
-setup_uv
+setup_uv PYTHON_VERSION="3.12"
 
 msg_info "Setup Unrar"
 cat <<EOF >/etc/apt/sources.list.d/non-free.list

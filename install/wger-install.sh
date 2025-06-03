@@ -20,8 +20,7 @@ $STD apt-get install -y \
   libapache2-mod-wsgi-py3
 msg_ok "Installed Dependencies"
 
-setup_uv
-$STD uv python install
+PYTHON_VERSION="3.12" setup_uv
 NODE_VERSION="22" NODE_MODULE="yarn@latest,sass" install_node_and_modules
 
 msg_info "Setting up wger"

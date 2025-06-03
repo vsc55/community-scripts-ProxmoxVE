@@ -19,12 +19,7 @@ $STD apt-get install -y git \
   build-essential
 msg_ok "Installed Dependencies"
 
-setup_uv
-UV_PYTHON_VERSION="3.12"
-
-msg_info "Installing Python $UV_PYTHON_VERSION via uv"
-$STD uv python install $UV_PYTHON_VERSION
-msg_ok "Installed Python $UV_PYTHON_VERSION"
+PYTHON_VERSION="3.12" setup_uv
 
 msg_info "Creating user octoprint"
 useradd -m -s /bin/bash -p $(openssl passwd -1 octoprint) octoprint
