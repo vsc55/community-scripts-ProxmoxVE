@@ -15,8 +15,9 @@ update_os
 
 msg_info "Installing Dependencies (Patience)"
 $STD apt-get install -y ffmpeg
-$STD apt-get install -y python3-pip
 msg_ok "Installed Dependencies"
+
+PYTHON_VERSION="3.12" setup_uv
 
 if [[ "$CTTYPE" == "0" ]]; then
   msg_info "Setting Up Hardware Acceleration"
@@ -33,7 +34,8 @@ if [[ "$CTTYPE" == "0" ]]; then
 fi
 
 msg_info "Installing Unmanic"
-$STD pip3 install unmanic
+uv venv /opt/unmanic/venv
+/opt/unmanic/venv/bin/uv pip install unmanic
 sed -i -e 's/^sgx:x:104:$/render:x:104:root/' -e 's/^render:x:106:root$/sgx:x:106:/' /etc/group
 msg_ok "Installed Unmanic"
 
@@ -47,7 +49,7 @@ StartLimitBurst=3
 
 [Service]
 Type=simple
-ExecStart=/usr/local/bin/unmanic
+ExecStart=/opt/unmanic/venv/bin/unmanic
 Restart=always
 RestartSec=30
 

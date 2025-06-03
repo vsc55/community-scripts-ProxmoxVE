@@ -35,8 +35,7 @@ $STD apt-get -y install --no-install-recommends \
   x11-apps
 msg_ok "Installed Dependencies"
 
-setup_uv
-$STD uv python install
+PYTHON_VERSION="3.12" setup_uv
 NODE_VERSION="22" NODE_MODULE="yarn@latest" install_node_and_modules
 
 msg_info "Installing Chromium"

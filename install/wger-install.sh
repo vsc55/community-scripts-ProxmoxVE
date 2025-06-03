@@ -39,13 +39,13 @@ tar xzf $RELEASE.tar.gz
 mv wger-$RELEASE /home/wger/src
 cd /home/wger/src
 $STD uv venv /home/wger/.venv
-$STD uv pip install -r requirements_prod.txt --python=/home/wger/.venv
-$STD uv pip install -e . --python=/home/wger/.venv
-$STD wger create-settings --database-path /home/wger/db/database.sqlite
+$STD /home/wger/.venv/bin/uv pip install -r requirements_prod.txt
+$STD /home/wger/.venv/bin/uv pip install -e .
+$STD /home/wger/.venv/bin/wger create-settings --database-path /home/wger/db/database.sqlite
 sed -i "s#home/wger/src/media#home/wger/media#g" /home/wger/src/settings.py
 sed -i "/MEDIA_ROOT = '\/home\/wger\/media'/a STATIC_ROOT = '/home/wger/static'" /home/wger/src/settings.py
-$STD wger bootstrap
-$STD uv python3 manage.py collectstatic
+$STD /home/wger/.venv/bin/wger bootstrap
+$STD /home/wger/.venv/bin/uv run python manage.py collectstatic
 echo "${RELEASE}" >/opt/wger_version.txt
 msg_ok "Finished setting up wger"
 
@@ -89,7 +89,7 @@ After=network.target
 [Service]
 Type=simple
 User=root
-ExecStart=/usr/local/bin/wger start -a 0.0.0.0 -p 3000
+ExecStart=/home/wger/.venv/bin/wger start -a 0.0.0.0 -p 3000
 Restart=always
 
 [Install]
