@@ -13,15 +13,10 @@ setting_up_container
 network_check
 update_os
 
-msg_info "Setup Python3"
-$STD apt-get install -y \
-  python3 \
-  python3-pip
-rm -rf /usr/lib/python3.*/EXTERNALLY-MANAGED
-msg_ok "Setup Python3"
+PYTHON_VERSION="3.12" setup_uv
 
 msg_info "Installing Prometheus Proxmox VE Exporter"
-python3 -m pip install --default-timeout=300 --quiet --root-user-action=ignore prometheus-pve-exporter
+$STD uv pip install prometheus-pve-exporter
 mkdir -p /opt/prometheus-pve-exporter
 cat <<EOF >/opt/prometheus-pve-exporter/pve.yml
 default:
@@ -42,7 +37,7 @@ After=syslog.target network.target
 User=root
 Restart=always
 Type=simple
-ExecStart=pve_exporter \
+ExecStart=/usr/local/bin/uv run pve_exporter \
     --config.file=/opt/prometheus-pve-exporter/pve.yml \
     --web.listen-address=0.0.0.0:9221
 ExecReload=/bin/kill -HUP \$MAINPID
