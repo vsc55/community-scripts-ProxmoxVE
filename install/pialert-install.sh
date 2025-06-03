@@ -42,17 +42,14 @@ $STD lighttpd-enable-mod fastcgi-php
 service lighttpd force-reload
 msg_ok "Installed PHP Dependencies"
 
+PYTHON_VERSION="3.12" setup_uv
+
 msg_info "Installing Python Dependencies"
-$STD apt-get -y install \
-  python3-pip \
-  python3-requests \
-  python3-tz \
-  python3-tzlocal
-rm -rf /usr/lib/python3.*/EXTERNALLY-MANAGED
-$STD pip3 install mac-vendor-lookup
-$STD pip3 install fritzconnection
-$STD pip3 install cryptography
-$STD pip3 install pyunifi
+source /opt/pialert/.venv/bin/activate
+$STD uv pip install mac-vendor-lookup
+$STD uv pip install fritzconnection
+$STD uv pip install cryptography
+$STD uv pip install pyunifi
 msg_ok "Installed Python Dependencies"
 
 msg_info "Installing Pi.Alert"
@@ -75,7 +72,7 @@ done
 sed -i 's#PIALERT_PATH\s*=\s*'\''/home/pi/pialert'\''#PIALERT_PATH           = '\''/opt/pialert'\''#' /opt/pialert/config/pialert.conf
 sed -i 's/$HOME/\/opt/g' /opt/pialert/install/pialert.cron
 crontab /opt/pialert/install/pialert.cron
-echo "python3 /opt/pialert/back/pialert.py 1" >/usr/bin/scan
+echo "/opt/pialert/.venv/bin/python /opt/pialert/back/pialert.py 1" >/usr/bin/scan
 chmod +x /usr/bin/scan
 echo "/opt/pialert/back/pialert-cli set_permissions --lxc" >/usr/bin/permissions
 chmod +x /usr/bin/permissions
@@ -84,9 +81,9 @@ chmod +x /usr/bin/sudoers
 msg_ok "Installed Pi.Alert"
 
 msg_info "Start Pi.Alert Scan (Patience)"
-$STD python3 /opt/pialert/back/pialert.py update_vendors
-$STD python3 /opt/pialert/back/pialert.py internet_IP
-$STD python3 /opt/pialert/back/pialert.py 1
+$STD /opt/pialert/.venv/bin/python /opt/pialert/back/pialert.py update_vendors
+$STD /opt/pialert/.venv/bin/python /opt/pialert/back/pialert.py internet_IP
+$STD /opt/pialert/.venv/bin/python /opt/pialert/back/pialert.py 1
 msg_ok "Finished Pi.Alert Scan"
 
 motd_ssh
