@@ -15,13 +15,11 @@ update_os
 
 msg_info "Installing Dependencies"
 $STD apt-get install -y \
-    par2 \
-    p7zip-full
+  par2 \
+  p7zip-full
 msg_ok "Installed Dependencies"
 
-msg_info "Setup uv"
 setup_uv
-msg_ok "Setup uv"
 
 msg_info "Setup Unrar"
 cat <<EOF >/etc/apt/sources.list.d/non-free.list

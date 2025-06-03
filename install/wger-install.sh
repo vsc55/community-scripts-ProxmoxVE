@@ -20,11 +20,8 @@ $STD apt-get install -y \
   libapache2-mod-wsgi-py3
 msg_ok "Installed Dependencies"
 
-msg_info "Installing Python"
-$STD apt-get install -y python3-pip
-rm -rf /usr/lib/python3.*/EXTERNALLY-MANAGED
-msg_ok "Installed Python"
-
+setup_uv
+$STD uv python install
 NODE_VERSION="22" NODE_MODULE="yarn@latest,sass" install_node_and_modules
 
 msg_info "Setting up wger"
@@ -42,13 +39,14 @@ curl -fsSL "https://github.com/wger-project/wger/archive/refs/tags/$RELEASE.tar.
 tar xzf $RELEASE.tar.gz
 mv wger-$RELEASE /home/wger/src
 cd /home/wger/src
-$STD pip install -r requirements_prod.txt
-$STD pip install -e .
+$STD uv venv /home/wger/.venv
+$STD uv pip install -r requirements_prod.txt --python=/home/wger/.venv
+$STD uv pip install -e . --python=/home/wger/.venv
 $STD wger create-settings --database-path /home/wger/db/database.sqlite
 sed -i "s#home/wger/src/media#home/wger/media#g" /home/wger/src/settings.py
 sed -i "/MEDIA_ROOT = '\/home\/wger\/media'/a STATIC_ROOT = '/home/wger/static'" /home/wger/src/settings.py
 $STD wger bootstrap
-$STD python3 manage.py collectstatic
+$STD uv python3 manage.py collectstatic
 echo "${RELEASE}" >/opt/wger_version.txt
 msg_ok "Finished setting up wger"
 

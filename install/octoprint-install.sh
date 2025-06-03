@@ -19,15 +19,12 @@ $STD apt-get install -y git \
   build-essential
 msg_ok "Installed Dependencies"
 
-msg_info "Setup Python3"
-$STD apt-get install -y \
-  python3 \
-  python3-dev \
-  python3-pip \
-  python3-venv \
-  python3-setuptools
-rm -rf /usr/lib/python3.*/EXTERNALLY-MANAGED
-msg_ok "Setup Python3"
+setup_uv
+UV_PYTHON_VERSION="3.12"
+
+msg_info "Installing Python $UV_PYTHON_VERSION via uv"
+$STD uv python install $UV_PYTHON_VERSION
+msg_ok "Installed Python $UV_PYTHON_VERSION"
 
 msg_info "Creating user octoprint"
 useradd -m -s /bin/bash -p $(openssl passwd -1 octoprint) octoprint
@@ -40,11 +37,9 @@ msg_info "Installing OctoPrint"
 $STD sudo -u octoprint bash <<EOF
 mkdir /opt/octoprint
 cd /opt/octoprint
-python3 -m venv .
-source bin/activate
-pip install --upgrade pip
-pip install wheel
-pip install octoprint
+uv venv --python $UV_PYTHON_VERSION
+uv pip install wheel
+uv pip install octoprint
 EOF
 msg_ok "Installed OctoPrint"
 
@@ -60,7 +55,7 @@ Environment="LC_ALL=C.UTF-8"
 Environment="LANG=C.UTF-8"
 Type=exec
 User=octoprint
-ExecStart=/opt/octoprint/bin/octoprint serve
+ExecStart=/opt/octoprint/.venv/bin/octoprint serve
 
 [Install]
 WantedBy=multi-user.target

@@ -23,6 +23,7 @@ $STD apt-get install -y \
   python3-pip
 msg_ok "Installed Dependencies"
 
+setup_uv
 NODE_VERSION="22" NODE_MODULE="pnpm@latest" install_node_and_modules
 PG_VERSION="16" PG_MODULES="postgis" install_postgresql
 
@@ -79,11 +80,13 @@ DISABLE_REGISTRATION=False
 EOF
 cd /opt/adventurelog/backend/server
 mkdir -p /opt/adventurelog/backend/server/media
-$STD pip install --upgrade pip
-$STD pip install -r requirements.txt
-$STD python3 manage.py collectstatic --noinput
-$STD python3 manage.py migrate
-$STD python3 manage.py download-countries
+$STD uv venv /opt/adventurelog/backend/server/venv
+source /opt/adventurelog/backend/server/venv/bin/activate
+$STD uv pip install --upgrade pip
+$STD uv pip install -r requirements.txt
+$STD uv python3 manage.py collectstatic --noinput
+$STD uv python3 manage.py migrate
+$STD uv python3 manage.py download-countries
 cat <<EOF >/opt/adventurelog/frontend/.env
 PUBLIC_SERVER_URL=http://$LOCAL_IP:8000
 BODY_SIZE_LIMIT=Infinity
@@ -96,7 +99,7 @@ echo "${RELEASE}" >"/opt/${APPLICATION}_version.txt"
 msg_ok "Installed AdventureLog"
 
 msg_info "Setting up Django Admin"
-$STD python3 /opt/adventurelog/backend/server/manage.py shell <<EOF
+$STD uv python3 /opt/adventurelog/backend/server/manage.py shell <<EOF
 from django.contrib.auth import get_user_model
 UserModel = get_user_model()
 user = UserModel.objects.create_user('$DJANGO_ADMIN_USER', password='$DJANGO_ADMIN_PASS')
