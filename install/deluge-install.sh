@@ -22,7 +22,7 @@ PYTHON_VERSION="3.12" setup_uv
 msg_info "Installing Deluge"
 mkdir -p /opt/deluge
 $STD uv venv /opt/deluge/.venv
-$STD /opt/deluge/.venv/bin/uv pip install deluge[all]
+$STD uv pip install deluge[all]
 msg_ok "Installed Deluge"
 
 msg_info "Creating Service"

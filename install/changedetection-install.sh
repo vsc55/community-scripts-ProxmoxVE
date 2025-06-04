@@ -50,7 +50,7 @@ msg_info "Installing Change Detection"
 mkdir -p /opt/changedetection
 cd /opt/changedetection
 $STD uv venv /opt/changedetection/.venv
-$STD /opt/changedetection/.venv/bin/uv pip install changedetection.io
+$STD uv pip install changedetection.io
 msg_ok "Installed Change Detection"
 
 msg_info "Installing Browserless & Playwright"

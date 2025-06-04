@@ -22,7 +22,7 @@ $STD unzip bazarr -d /opt/bazarr
 chmod 775 /opt/bazarr /var/lib/bazarr/
 cd /opt/bazarr
 $STD uv venv /opt/bazarr/.venv
-$STD /opt/bazarr/.venv/bin/uv pip install -r requirements.txt
+$STD uv pip install -r requirements.txt
 msg_ok "Installed Bazarr"
 
 msg_info "Creating Service"

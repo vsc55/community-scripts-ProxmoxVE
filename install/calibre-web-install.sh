@@ -32,7 +32,7 @@ mkdir -p /opt/calibre-web
 $STD curl -fsSL https://github.com/janeczku/calibre-web/raw/master/library/metadata.db -o /opt/calibre-web/metadata.db
 cd /opt/calibre-web
 $STD uv venv /opt/calibre-web/.venv
-$STD /opt/calibre-web/.venv/bin/uv pip install calibreweb jsonschema
+$STD uv pip install calibreweb jsonschema
 msg_ok "Installed Calibre-Web"
 
 msg_info "Creating Service"

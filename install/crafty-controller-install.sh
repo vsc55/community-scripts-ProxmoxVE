@@ -49,9 +49,8 @@ cd /opt/crafty-controller/crafty
 $STD uv venv /opt/crafty-controller/crafty/.venv
 chown -R crafty:crafty /opt/crafty-controller/
 $STD sudo -u crafty bash -c '
-    source /opt/crafty-controller/crafty/.venv/bin/activate
     cd /opt/crafty-controller/crafty/crafty-4
-    /opt/crafty-controller/crafty/.venv/bin/uv pip install --no-cache-dir -r requirements.txt
+    uv pip install --no-cache-dir -r requirements.txt
 '
 msg_ok "Installed Craft-Controller and dependencies"
 
