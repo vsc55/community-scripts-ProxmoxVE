@@ -1064,24 +1064,21 @@ function setup_uv() {
 
   # set path
   ensure_usr_local_bin_persist
-  msg_ok "uv installed/updated to $LATEST_VERSION"
+  msg_ok "uv $LATEST_VERSION installed "
 
   if [[ -n "$PYTHON_VERSION" ]]; then
     $STD msg_info "Ensuring Python $PYTHON_VERSION is available via uv..."
+    VERSION_MATCH=$(uv python list --only-downloads | grep -E "^cpython-${PYTHON_VERSION//./\\.}\.[0-9]+-linux" | cut -d'-' -f2 | sort -V | tail -n1)
 
-    FULL_PYTHON=$(uv python list | grep -E "^cpython-${PYTHON_VERSION//./\\.}\.[0-9]+-linux.*<download available>" | sort -V | tail -n1 | awk '{print $1}')
-
-    if [[ -z "$FULL_PYTHON" ]]; then
+    if [[ -z "$VERSION_MATCH" ]]; then
       msg_error "No matching Python $PYTHON_VERSION.x version found via uv"
       return 1
     fi
-
-    # check if already installed
-    if uv python list | grep -q "$FULL_PYTHON.*uv/python"; then
-      $STD msg_ok "Python ${FULL_PYTHON#cpython-} already installed via uv"
+    if uv python list | grep -q "cpython-${VERSION_MATCH}-linux.*uv/python"; then
+      $STD msg_ok "Python ${VERSION_MATCH} already installed via uv"
     else
-      $STD uv python install "${FULL_PYTHON#cpython-}"
-      msg_ok "Installed Python ${FULL_PYTHON#cpython-} via uv"
+      $STD uv python install "${VERSION_MATCH}"
+      msg_ok "Installed Python ${VERSION_MATCH} via uv"
     fi
   fi
 
