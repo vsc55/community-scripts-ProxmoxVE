@@ -14,9 +14,7 @@ setting_up_container
 network_check
 update_os
 
-NODE_VERSION="22"
-NODE_MODULE="npm@latest,yarn@latest"
-install_node_and_modules
+NODE_VERSION="22" NODE_MODULE="npm@latest,yarn@latest" install_node_and_modules
 setup_uv
 fetch_and_deploy_gh_release "CrazyWolf13/streamlink-webui"
 

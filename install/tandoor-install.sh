@@ -38,8 +38,9 @@ NODE_VERSION="20" NODE_MODULE="yarn@latest" install_node_and_modules
 msg_info "Installing Tandoor (Patience)"
 $STD git clone https://github.com/TandoorRecipes/recipes -b master /opt/tandoor
 mkdir -p /opt/tandoor/{config,api,mediafiles,staticfiles}
-$STD uv venv /opt/tandoor/venv
-$STD /opt/tandoor/venv/bin/uv pip install -r /opt/tandoor/requirements.txt
+cd /opt/tandoor
+$STD uv venv /opt/tandoor/.venv
+$STD uv pip install -r requirements.txt
 
 cd /opt/tandoor/vue
 $STD yarn install
@@ -59,7 +60,7 @@ sed -i -e "s|SECRET_KEY=.*|SECRET_KEY=$secret_key|g" \
   -e "s|POSTGRES_USER=.*|POSTGRES_USER=$DB_USER|g" \
   -e "\$a\STATIC_URL=/staticfiles/" /opt/tandoor/.env
 cd /opt/tandoor
-$STD /opt/tandoor/venv/bin/uv run python version.py
+$STD uv run python version.py
 msg_ok "Installed Tandoor"
 
 msg_info "Install/Set up PostgreSQL Database"
@@ -77,9 +78,9 @@ echo -e "Tandoor Database Name: \e[32m$DB_NAME\e[0m" >>~/tandoor.creds
 echo -e "Tandoor Database User: \e[32m$DB_USER\e[0m" >>~/tandoor.creds
 echo -e "Tandoor Database Password: \e[32m$DB_PASS\e[0m" >>~/tandoor.creds
 export $(cat /opt/tandoor/.env | grep "^[^#]" | xargs)
-$STD /opt/tandoor/venv/bin/uv run python manage.py migrate
-$STD /opt/tandoor/venv/bin/uv run python manage.py collectstatic --no-input
-$STD /opt/tandoor/venv/bin/uv run python manage.py collectstatic_js_reverse
+$STD uv run python manage.py migrate
+$STD uv run python manage.py collectstatic --no-input
+$STD uv run python manage.py collectstatic_js_reverse
 msg_ok "Set up PostgreSQL Database"
 
 msg_info "Creating Services"
@@ -94,7 +95,7 @@ Restart=always
 RestartSec=3
 WorkingDirectory=/opt/tandoor
 EnvironmentFile=/opt/tandoor/.env
-ExecStart=/opt/tandoor/venv/bin/gunicorn --error-logfile /tmp/gunicorn_err.log --log-level debug --capture-output --bind unix:/opt/tandoor/tandoor.sock recipes.wsgi:application
+ExecStart=/opt/tandoor/.venv/bin/gunicorn --error-logfile /tmp/gunicorn_err.log --log-level debug --capture-output --bind unix:/opt/tandoor/tandoor.sock recipes.wsgi:application
 
 [Install]
 WantedBy=multi-user.target

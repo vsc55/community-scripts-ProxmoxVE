@@ -22,7 +22,7 @@ PYTHON_VERSION="3.12" setup_uv
 msg_info "Setting up Virtual Environment"
 mkdir -p /opt/esphome
 $STD uv venv /opt/esphome/.venv
-$STD /opt/esphome/.venv/bin/uv pip install esphome tornado esptool
+$STD uv pip install esphome tornado esptool
 msg_ok "Setup and Installed ESPHome"
 
 msg_info "Creating Service"

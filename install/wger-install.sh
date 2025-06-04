@@ -39,8 +39,8 @@ tar xzf $RELEASE.tar.gz
 mv wger-$RELEASE /home/wger/src
 cd /home/wger/src
 $STD uv venv /home/wger/.venv
-$STD /home/wger/.venv/bin/uv pip install -r requirements_prod.txt
-$STD /home/wger/.venv/bin/uv pip install -e .
+$STD uv pip install -r requirements_prod.txt
+$STD uv pip install -e .
 $STD /home/wger/.venv/bin/wger create-settings --database-path /home/wger/db/database.sqlite
 sed -i "s#home/wger/src/media#home/wger/media#g" /home/wger/src/settings.py
 sed -i "/MEDIA_ROOT = '\/home\/wger\/media'/a STATIC_ROOT = '/home/wger/static'" /home/wger/src/settings.py

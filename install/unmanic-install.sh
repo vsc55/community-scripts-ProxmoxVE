@@ -34,8 +34,10 @@ if [[ "$CTTYPE" == "0" ]]; then
 fi
 
 msg_info "Installing Unmanic"
-uv venv /opt/unmanic/venv
-/opt/unmanic/venv/bin/uv pip install unmanic
+mkdir -p /opt/unmanic
+cd /opt/unmanic
+$STD uv venv /opt/unmanic/.venv
+$STD uv pip install unmanic
 sed -i -e 's/^sgx:x:104:$/render:x:104:root/' -e 's/^render:x:106:root$/sgx:x:106:/' /etc/group
 msg_ok "Installed Unmanic"
 
@@ -49,7 +51,7 @@ StartLimitBurst=3
 
 [Service]
 Type=simple
-ExecStart=/opt/unmanic/venv/bin/unmanic
+ExecStart=/opt/unmanic/.venv/bin/unmanic
 Restart=always
 RestartSec=30
 

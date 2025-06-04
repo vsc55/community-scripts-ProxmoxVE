@@ -31,8 +31,8 @@ curl -fsSL "https://github.com/Donkie/Spoolman/releases/download/$RELEASE/spoolm
 $STD unzip spoolman.zip -d spoolman
 rm -f spoolman.zip
 cd spoolman
-$STD uv venv /opt/spoolman/venv
-$STD /opt/spoolman/venv/bin/uv pip install -r requirements.txt
+$STD uv venv /opt/spoolman/.venv
+$STD uv pip install -r requirements.txt
 curl -fsSL "https://raw.githubusercontent.com/Donkie/Spoolman/master/.env.example" -o ".env"
 echo "${RELEASE}" >/opt/${APPLICATION}_version.txt
 msg_ok "Installed Spoolman"
@@ -47,7 +47,7 @@ After=network.target
 Type=simple
 WorkingDirectory=/opt/spoolman
 EnvironmentFile=/opt/spoolman/.env
-ExecStart=/opt/spoolman/venv/bin/uvicorn spoolman.main:app --host 0.0.0.0 --port 7912
+ExecStart=/opt/spoolman/.venv/bin/uvicorn spoolman.main:app --host 0.0.0.0 --port 7912
 Restart=always
 User=root
 

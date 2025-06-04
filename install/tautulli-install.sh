@@ -22,9 +22,10 @@ PYTHON_VERSION="3.12" setup_uv
 msg_info "Installing Tautulli"
 cd /opt
 $STD git clone https://github.com/Tautulli/Tautulli.git
-$STD uv venv /opt/Tautulli/venv
-$STD /opt/Tautulli/venv/bin/uv pip install -r /opt/Tautulli/requirements.txt
-$STD /opt/Tautulli/venv/bin/uv pip install pyopenssl
+cd /opt/Tautulli
+$STD uv venv /opt/Tautulli/.venv
+$STD uv pip install -r /opt/Tautulli/requirements.txt
+$STD uv pip install pyopenssl
 msg_ok "Installed Tautulli"
 
 msg_info "Creating Service"
@@ -38,7 +39,7 @@ WorkingDirectory=/opt/Tautulli/
 Restart=on-failure
 RestartSec=5
 Type=simple
-ExecStart=/opt/Tautulli/venv/bin/python /opt/Tautulli/Tautulli.py
+ExecStart=/opt/Tautulli/.venv/bin/python /opt/Tautulli/Tautulli.py
 KillSignal=SIGINT
 TimeoutStopSec=20
 SyslogIdentifier=tautulli

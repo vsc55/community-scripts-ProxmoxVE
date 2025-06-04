@@ -21,8 +21,10 @@ PYTHON_VERSION="3.12" setup_uv
 NODE_VERSION="22" NODE_MODULE="yarn@latest" install_node_and_modules
 
 msg_info "Setup Platformio"
-uv venv /opt/tasmocompiler/venv
-$STD /opt/tasmocompiler/venv/bin/uv pip install platformio
+mkdir -p /opt/tasmocompiler
+cd /opt/tasmocompiler
+$STD uv venv /opt/tasmocompiler/.venv
+$STD uv pip install platformio
 msg_ok "Setup Platformio"
 
 msg_info "Setup TasmoCompiler"
