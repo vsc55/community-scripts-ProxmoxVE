@@ -13,6 +13,8 @@ setting_up_container
 network_check
 update_os
 
+PYTHON_VERSION="3.12" setup_uv
+
 msg_info "Configuring apt and installing dependencies"
 echo "deb http://deb.debian.org/debian testing main contrib" >/etc/apt/sources.list.d/immich.list
 cat <<EOF >/etc/apt/preferences.d/immich
@@ -27,8 +29,6 @@ $STD apt-get install --no-install-recommends -y \
   redis \
   autoconf \
   build-essential \
-  python3-venv \
-  python3-dev \
   cmake \
   jq \
   libbrotli-dev \
@@ -304,25 +304,25 @@ cp LICENSE "$APP_DIR"
 msg_ok "Installed Immich Web Components"
 
 cd "$SRC_DIR"/machine-learning
-$STD python3 -m venv "$ML_DIR/ml-venv"
+$STD uv venv "$ML_DIR/.venv"
+$ML_DIR/.venv/bin/uv pip install --upgrade uv
+$ML_DIR/.venv/bin/uv sync --no-cache
+cd "$SRC_DIR"/machine-learning
+$STD uv venv "$ML_DIR/.venv"
+$ML_DIR/.venv/bin/uv pip install --upgrade uv
+
 if [[ -f ~/.openvino ]]; then
   msg_info "Installing HW-accelerated machine-learning"
-  (
-    source "$ML_DIR"/ml-venv/bin/activate
-    $STD pip3 install uv
-    uv -q sync --extra openvino --no-cache --active
-  )
-  patchelf --clear-execstack "$ML_DIR"/ml-venv/lib/python3.11/site-packages/onnxruntime/capi/onnxruntime_pybind11_state.cpython-311-x86_64-linux-gnu.so
+  $STD "$ML_DIR/.venv/bin/uv" sync --no-cache --extra openvino
+  patchelf --clear-execstack "$ML_DIR/.venv/lib/python3.12/site-packages/onnxruntime/capi/onnxruntime_pybind11_state.cpython-312-x86_64-linux-gnu.so"
   msg_ok "Installed HW-accelerated machine-learning"
+
 else
   msg_info "Installing machine-learning"
-  (
-    source "$ML_DIR"/ml-venv/bin/activate
-    $STD pip3 install uv
-    uv -q sync --extra cpu --no-cache --active
-  )
+  $STD "$ML_DIR/.venv/bin/uv" sync --no-cache --extra cpu
   msg_ok "Installed machine-learning"
 fi
+
 cd "$SRC_DIR"
 cp -a machine-learning/{ann,immich_ml} "$ML_DIR"
 if [[ -f ~/.openvino ]]; then
