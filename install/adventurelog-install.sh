@@ -78,7 +78,7 @@ DISABLE_REGISTRATION=False
 EOF
 cd /opt/adventurelog/backend/server
 mkdir -p /opt/adventurelog/backend/server/media
-$STD uv venv --python /opt/adventurelog/backend/server/.venv
+$STD uv venv /opt/adventurelog/backend/server/.venv
 $STD uv pip install --upgrade pip
 $STD uv pip install -r requirements.txt
 $STD uv run python manage.py collectstatic --noinput
