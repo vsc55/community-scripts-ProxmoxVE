@@ -79,11 +79,10 @@ EOF
 cd /opt/adventurelog/backend/server
 mkdir -p /opt/adventurelog/backend/server/media
 $STD uv venv /opt/adventurelog/backend/server/.venv
-$STD /opt/adventurelog/backend/server/.venv/bin/python -m pip install --upgrade pip
-$STD /opt/adventurelog/backend/server/.venv/bin/python -m pip install -r requirements.txt
-$STD /opt/adventurelog/backend/server/.venv/bin/python manage.py collectstatic --noinput
-$STD /opt/adventurelog/backend/server/.venv/bin/python manage.py migrate
-$STD /opt/adventurelog/backend/server/.venv/bin/python manage.py download-countries
+$STD uv pip install -r requirements.txt
+$STD uv run python manage.py collectstatic --noinput
+$STD uv run python manage.py migrate
+$STD uv run python manage.py download-countries
 cat <<EOF >/opt/adventurelog/frontend/.env
 PUBLIC_SERVER_URL=http://$LOCAL_IP:8000
 BODY_SIZE_LIMIT=Infinity
