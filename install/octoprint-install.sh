@@ -32,7 +32,7 @@ msg_info "Installing OctoPrint"
 $STD sudo -u octoprint bash <<EOF
 mkdir /opt/octoprint
 cd /opt/octoprint
-uv venv --python $UV_PYTHON_VERSION
+uv venv --python $PYTHON_VERSION
 uv pip install wheel
 uv pip install octoprint
 EOF
