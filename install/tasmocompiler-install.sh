@@ -29,15 +29,17 @@ tar xzf /tmp/v${RELEASE}.tar.gz
 mv tasmocompiler-${RELEASE}/ /opt/tasmocompiler/
 cd /opt/tasmocompiler
 $STD uv venv /opt/tasmocompiler/.venv
-$STD uv pip install platformio
+$STD /opt/tasmocompiler/.venv/bin/python -m ensurepip --upgrade
+$STD /opt/tasmocompiler/.venv/bin/python -m pip install --upgrade pip
+$STD /opt/tasmocompiler/.venv/bin/python -m pip install platformio
 $STD yarn install
 export NODE_OPTIONS=--openssl-legacy-provider
 $STD npm i
 $STD yarn build
 mkdir -p /usr/local/bin
-ln -sf /opt/tasmocompiler/venv/bin/platformio /usr/local/bin/platformio
-ln -sf /opt/tasmocompiler/venv/bin/pio /usr/local/bin/pio
-ln -sf /opt/tasmocompiler/venv/bin/piodebuggdb /usr/local/bin/piodebuggdb
+ln -sf /opt/tasmocompiler/.venv/bin/platformio /usr/local/bin/platformio
+ln -sf /opt/tasmocompiler/.venv/bin/pio /usr/local/bin/pio
+ln -sf /opt/tasmocompiler/.venv/bin/piodebuggdb /usr/local/bin/piodebuggdb
 echo "${RELEASE}" >"/opt/tasmocompiler_version.txt"
 msg_ok "Setup TasmoCompiler"
 
