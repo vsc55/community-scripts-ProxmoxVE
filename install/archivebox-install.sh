@@ -25,21 +25,17 @@ $STD apt-get install -y \
   ripgrep
 msg_ok "Installed Dependencies"
 
+PYTHON_VERSION="3.12" setup_uv
 NODE_VERSION="22" install_node_and_modules
 
-msg_info "Installing ArchiveBox Python Environment"
+msg_info "Installing ArchiveBox"
 mkdir -p /opt/archivebox/{data,.npm,.cache,.local}
 adduser --system --shell /bin/bash --gecos 'Archive Box User' --group --disabled-password --home /home/archivebox archivebox
 chown -R archivebox:archivebox /opt/archivebox/{data,.npm,.cache,.local}
 chmod -R 755 /opt/archivebox/data
-
-cd /opt/archivebox
-PYTHON_VERSION="3.12" setup_uv
-
-msg_info "Installing ArchiveBox & Playwright (Patience)"
-cd /opt/archivebox/data
-cp /opt/archivebox/uv.lock . || true
-$STD /opt/archivebox/.venv/bin/uv sync
+$STD uv venv --python "$PYTHON_VERSION" /opt/archivebox/.venv
+$STD /opt/archivebox/.venv/bin/uv pip install --all-extras archivebox
+$STD /opt/archivebox/.venv/bin/uv pip install playwright
 sudo -u archivebox /opt/archivebox/.venv/bin/playwright install-deps chromium
 msg_ok "Installed ArchiveBox & Playwright"
 
