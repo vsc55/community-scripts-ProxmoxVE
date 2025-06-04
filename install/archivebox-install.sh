@@ -33,6 +33,7 @@ msg_info "Installing ArchiveBox"
 mkdir -p /opt/archivebox/{data,.npm,.cache,.local}
 adduser --system --shell /bin/bash --gecos 'Archive Box User' --group --disabled-password --home /home/archivebox archivebox
 
+sudo -u archivebox bash
 cd /opt/archivebox
 uv venv --python 3 .venv
 uv pip install "archivebox[all]"
