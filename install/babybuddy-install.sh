@@ -19,11 +19,10 @@ $STD apt-get install -y \
   uwsgi-plugin-python3 \
   libopenjp2-7-dev \
   libpq-dev \
-  nginx \
-  python3
+  nginx
 msg_ok "Installed Dependencies"
 
-setup_uv
+PYTHON_VERSION="3.12" setup_uv
 
 msg_info "Installing Babybuddy"
 RELEASE=$(curl -fsSL https://api.github.com/repos/babybuddy/babybuddy/releases/latest | grep "tag_name" | awk '{print substr($2, 3, length($2)-4) }')
@@ -33,8 +32,8 @@ curl -fsSL "https://github.com/babybuddy/babybuddy/archive/refs/tags/v${RELEASE}
 tar zxf "$temp_file" --strip-components=1 -C /opt/babybuddy
 cd /opt/babybuddy
 $STD uv venv .venv
-$STD source .venv/bin/activate
-$STD uv pip install -r requirements.txt
+$STD .venv/bin/uv pip install -r requirements.txt
+
 cp babybuddy/settings/production.example.py babybuddy/settings/production.py
 SECRET_KEY=$(openssl rand -base64 32 | tr -dc 'a-zA-Z0-9' | cut -c1-32)
 ALLOWED_HOSTS=$(hostname -I | tr ' ' ',' | sed 's/,$//')",127.0.0.1,localhost"
@@ -44,7 +43,7 @@ sed -i \
   babybuddy/settings/production.py
 
 export DJANGO_SETTINGS_MODULE=babybuddy.settings.production
-$STD python manage.py migrate
+$STD /opt/babybuddy/.venv/bin/python manage.py migrate
 chown -R www-data:www-data /opt/data
 chmod 640 /opt/data/db.sqlite3
 chmod 750 /opt/data
@@ -93,7 +92,7 @@ server {
 EOF
 
 ln -sf /etc/nginx/sites-available/babybuddy /etc/nginx/sites-enabled/babybuddy
-rm /etc/nginx/sites-enabled/default
+rm -f /etc/nginx/sites-enabled/default
 systemctl enable -q --now nginx
 service nginx reload
 msg_ok "Configured NGINX"

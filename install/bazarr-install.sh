@@ -13,20 +13,15 @@ setting_up_container
 network_check
 update_os
 
-msg_info "Setup Python3"
-$STD apt-get install -y \
-  python3 \
-  python3-dev \
-  python3-pip
-rm -rf /usr/lib/python3.*/EXTERNALLY-MANAGED
-msg_ok "Setup Python3"
+PYTHON_VERSION="3.12" setup_uv
 
 msg_info "Installing Bazarr"
 mkdir -p /var/lib/bazarr/
 curl -fsSL "https://github.com/morpheus65535/bazarr/releases/latest/download/bazarr.zip" -o "bazarr.zip"
 $STD unzip bazarr -d /opt/bazarr
 chmod 775 /opt/bazarr /var/lib/bazarr/
-$STD python3 -m pip install -q -r /opt/bazarr/requirements.txt
+cd /opt/bazarr
+$STD /opt/bazarr/.venv/bin/uv pip install -r requirements.txt
 msg_ok "Installed Bazarr"
 
 msg_info "Creating Service"
@@ -41,7 +36,7 @@ UMask=0002
 Restart=on-failure
 RestartSec=5
 Type=simple
-ExecStart=/usr/bin/python3 /opt/bazarr/bazarr.py
+ExecStart=/opt/bazarr/.venv/bin/python /opt/bazarr/bazarr.py
 KillSignal=SIGINT
 TimeoutStopSec=20
 SyslogIdentifier=bazarr
