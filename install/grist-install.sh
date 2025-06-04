@@ -30,7 +30,9 @@ $STD unzip "v${RELEASE}.zip"
 mv "grist-core-${RELEASE}" /opt/grist
 cd /opt/grist
 $STD uv venv /opt/grist/sandbox_venv3
-$STD /opt/grist/sandbox_venv3/bin/uv pip install -r sandbox/requirements.txt
+$STD /opt/grist/sandbox_venv3/bin/python -m ensurepip --upgrade
+$STD /opt/grist/sandbox_venv3/bin/python -m pip install --upgrade pip
+$STD /opt/grist/sandbox_venv3/bin/python -m pip install -r sandbox/requirements.txt
 $STD yarn install
 $STD yarn run build:prod
 ln -sf /opt/grist/sandbox_venv3/bin/python3 /opt/grist/sandbox_venv3/bin/python

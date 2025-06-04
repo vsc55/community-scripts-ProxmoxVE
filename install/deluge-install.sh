@@ -23,7 +23,7 @@ msg_info "Installing Deluge"
 mkdir -p /opt/deluge
 cd /opt/deluge
 $STD uv venv /opt/deluge/.venv
-$STD uv pip install deluge[all]
+$STD uv pip install "deluge[all]" libtorrent
 msg_ok "Installed Deluge"
 
 msg_info "Creating Service"

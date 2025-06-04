@@ -22,6 +22,8 @@ $STD unzip bazarr -d /opt/bazarr
 chmod 775 /opt/bazarr /var/lib/bazarr/
 cd /opt/bazarr
 $STD uv venv /opt/bazarr/.venv
+$STD /opt/bazarr/.venv/bin/python -m ensurepip --upgrade
+$STD /opt/bazarr/.venv/bin/python -m pip install --upgrade pip
 $STD /opt/bazarr/.venv/bin/python -m pip install -r requirements.txt
 msg_ok "Installed Bazarr"
 

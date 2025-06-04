@@ -16,8 +16,10 @@ update_os
 PYTHON_VERSION="3.12" setup_uv
 
 msg_info "Installing Prometheus Proxmox VE Exporter"
-$STD uv pip install prometheus-pve-exporter
 mkdir -p /opt/prometheus-pve-exporter
+cd /opt/prometheus-pve-exporter
+$STD uv venv /opt/prometheus-pve-exporter/.venv
+$STD uv pip install prometheus-pve-exporter
 cat <<EOF >/opt/prometheus-pve-exporter/pve.yml
 default:
     user: prometheus@pve
@@ -37,7 +39,7 @@ After=syslog.target network.target
 User=root
 Restart=always
 Type=simple
-ExecStart=/usr/local/bin/uv run pve_exporter \
+ExecStart=/opt/prometheus-pve-exporter/.venv/bin/pve_exporter \
     --config.file=/opt/prometheus-pve-exporter/pve.yml \
     --web.listen-address=0.0.0.0:9221
 ExecReload=/bin/kill -HUP \$MAINPID
