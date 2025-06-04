@@ -29,14 +29,27 @@ PYTHON_VERSION="3.12" setup_uv
 NODE_VERSION="22" install_node_and_modules
 
 msg_info "Installing ArchiveBox"
+
 mkdir -p /opt/archivebox/{data,.npm,.cache,.local}
 adduser --system --shell /bin/bash --gecos 'Archive Box User' --group --disabled-password --home /home/archivebox archivebox
-chown -R archivebox:archivebox /opt/archivebox/{data,.npm,.cache,.local}
-chmod -R 755 /opt/archivebox/data
-$STD uv venv /opt/archivebox/.venv
-$STD uv pip install "[all]"
-$STD uv pip install playwright
+
+cd /opt/archivebox
+uv venv --python 3.12 .venv
+
+EXTRAS=$(curl -s https://raw.githubusercontent.com/ArchiveBox/ArchiveBox/dev/setup.cfg |
+  awk '/\[options.extras_require\]/,/\[.*\]/' |
+  grep -E '^[a-zA-Z0-9_-]+ *= *' |
+  cut -d= -f1 | tr -d ' ' | paste -sd, -)
+
+uv pip install "archivebox[$EXTRAS]"
+uv pip install playwright
+
+chown -R archivebox:archivebox /opt/archivebox
+chmod -R 755 /opt/archivebox
+
 sudo -u archivebox /opt/archivebox/.venv/bin/playwright install-deps chromium
+sudo -u archivebox /opt/archivebox/.venv/bin/playwright install chromium
+
 msg_ok "Installed ArchiveBox & Playwright"
 
 msg_info "Initial ArchiveBox Setup"
