@@ -35,13 +35,7 @@ adduser --system --shell /bin/bash --gecos 'Archive Box User' --group --disabled
 
 cd /opt/archivebox
 uv venv --python 3.12 .venv
-
-EXTRAS=$(curl -s https://raw.githubusercontent.com/ArchiveBox/ArchiveBox/dev/setup.cfg |
-  awk '/\[options.extras_require\]/,/\[.*\]/' |
-  grep -E '^[a-zA-Z0-9_-]+ *= *' |
-  cut -d= -f1 | tr -d ' ' | paste -sd, -)
-
-uv pip install "archivebox[$EXTRAS]"
+uv pip install "archivebox[all]"
 uv pip install playwright
 
 chown -R archivebox:archivebox /opt/archivebox
