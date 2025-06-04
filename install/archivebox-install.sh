@@ -33,7 +33,7 @@ mkdir -p /opt/archivebox/{data,.npm,.cache,.local}
 adduser --system --shell /bin/bash --gecos 'Archive Box User' --group --disabled-password --home /home/archivebox archivebox
 chown -R archivebox:archivebox /opt/archivebox/{data,.npm,.cache,.local}
 chmod -R 755 /opt/archivebox/data
-$STD uv venv --python "$PYTHON_VERSION" /opt/archivebox/.venv
+$STD uv venv /opt/archivebox/.venv
 $STD /opt/archivebox/.venv/bin/uv pip install --all-extras archivebox
 $STD /opt/archivebox/.venv/bin/uv pip install playwright
 sudo -u archivebox /opt/archivebox/.venv/bin/playwright install-deps chromium
