@@ -30,9 +30,9 @@ useradd -d /etc/searxng searxng
 chown searxng:searxng /usr/local/searxng /etc/searxng
 $STD git clone https://github.com/searxng/searxng.git /usr/local/searxng/searxng-src
 cd /usr/local/searxng/
-$STD uv venv /usr/local/searxng/searx-pyenv
-$STD /usr/local/searxng/searx-pyenv/bin/uv pip install --upgrade pip setuptools wheel pyyaml
-$STD /usr/local/searxng/searx-pyenv/bin/uv pip install --use-pep517 --no-build-isolation -e /usr/local/searxng/searxng-src
+$STD uv venv /usr/local/searxng/.venv
+$STD uv pip install --upgrade pip setuptools wheel pyyaml
+$STD uv pip install --no-build-isolation -e /usr/local/searxng/searxng-src
 
 SECRET_KEY=$(openssl rand -hex 32)
 cat <<EOF >/etc/searxng/settings.yml

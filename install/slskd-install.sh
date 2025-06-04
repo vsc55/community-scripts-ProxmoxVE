@@ -43,7 +43,7 @@ $STD unzip main.zip
 mv soularr-main /opt/soularr
 cd /opt/soularr
 $STD uv venv /opt/soularr/.venv
-$STD /opt/soularr/.venv/bin/uv pip install -r requirements.txt
+$STD uv pip install -r requirements.txt
 sed -i \
   -e "\|[Slskd]|,\|host_url|s|yourslskdapikeygoeshere|$SLSKD_API_KEY|" \
   -e "/host_url/s/slskd/localhost/" \

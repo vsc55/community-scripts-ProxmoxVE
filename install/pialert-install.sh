@@ -44,17 +44,15 @@ msg_ok "Installed PHP Dependencies"
 
 PYTHON_VERSION="3.12" setup_uv
 
-msg_info "Installing Python Dependencies"
-source /opt/pialert/.venv/bin/activate
+msg_info "Installing Pi.Alert"
+curl -fsSL https://github.com/leiweibau/Pi.Alert/raw/main/tar/pialert_latest.tar | tar xvf - -C /opt >/dev/null 2>&1
+rm -rf /var/lib/ieee-data /var/www/html/index.html
+cd /opt/pialert
+$STD uv venv /opt/pialert/.venv
 $STD uv pip install mac-vendor-lookup
 $STD uv pip install fritzconnection
 $STD uv pip install cryptography
 $STD uv pip install pyunifi
-msg_ok "Installed Python Dependencies"
-
-msg_info "Installing Pi.Alert"
-curl -fsSL https://github.com/leiweibau/Pi.Alert/raw/main/tar/pialert_latest.tar | tar xvf - -C /opt >/dev/null 2>&1
-rm -rf /var/lib/ieee-data /var/www/html/index.html
 sed -i -e 's#^sudo cp -n /usr/share/ieee-data/.* /var/lib/ieee-data/#\# &#' -e '/^sudo mkdir -p 2_backup$/s/^/# /' -e '/^sudo cp \*.txt 2_backup$/s/^/# /' -e '/^sudo cp \*.csv 2_backup$/s/^/# /' /opt/pialert/back/update_vendors.sh
 mv /var/www/html/index.lighttpd.html /var/www/html/index.lighttpd.html.old
 ln -s /usr/share/ieee-data/ /var/lib/

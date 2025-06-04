@@ -14,7 +14,7 @@ network_check
 update_os
 
 msg_info "Installing Dependencies (Patience)"
-$STD apt-get install -y ffmpeg
+$STD apt-get install -y ffmpeg gcc
 msg_ok "Installed Dependencies"
 
 PYTHON_VERSION="3.12" setup_uv

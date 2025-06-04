@@ -33,6 +33,7 @@ rm -f spoolman.zip
 cd spoolman
 $STD uv venv /opt/spoolman/.venv
 $STD uv pip install -r requirements.txt
+
 curl -fsSL "https://raw.githubusercontent.com/Donkie/Spoolman/master/.env.example" -o ".env"
 echo "${RELEASE}" >/opt/${APPLICATION}_version.txt
 msg_ok "Installed Spoolman"

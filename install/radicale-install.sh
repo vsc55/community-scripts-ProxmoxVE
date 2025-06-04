@@ -21,8 +21,10 @@ msg_ok "Installed Dependencies"
 PYTHON_VERSION="3.12" setup_uv
 
 msg_info "Setting up Radicale"
-$STD uv venv /opt/radicale
-$STD /opt/radicale/bin/uv pip install --upgrade https://github.com/Kozea/Radicale/archive/master.tar.gz
+mkdir -p /opt/radicale/{users}
+cd /opt/radicale
+$STD uv venv /opt/radicale/.venv
+$STD uv pip install --upgrade https://github.com/Kozea/Radicale/archive/master.tar.gz
 RNDPASS=$(openssl rand -base64 18 | tr -dc 'a-zA-Z0-9' | head -c13)
 $STD htpasswd -c -b -5 /opt/radicale/users admin "$RNDPASS"
 {
@@ -35,7 +37,7 @@ msg_ok "Done setting up Radicale"
 msg_info "Setup Service"
 cat <<EOF >/opt/radicale/start.sh
 #!/usr/bin/env bash
-/opt/radicale/bin/uv run -m radicale --storage-filesystem-folder=/var/lib/radicale/collections --hosts 0.0.0.0:5232 --auth-type htpasswd --auth-htpasswd-filename /opt/radicale/users --auth-htpasswd-encryption sha512
+uv run -m radicale --storage-filesystem-folder=/var/lib/radicale/collections --hosts 0.0.0.0:5232 --auth-type htpasswd --auth-htpasswd-filename /opt/radicale/users --auth-htpasswd-encryption sha512
 EOF
 
 chmod +x /opt/radicale/start.sh
