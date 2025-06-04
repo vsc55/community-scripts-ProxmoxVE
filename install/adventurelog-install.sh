@@ -78,7 +78,7 @@ DISABLE_REGISTRATION=False
 EOF
 cd /opt/adventurelog/backend/server
 mkdir -p /opt/adventurelog/backend/server/media
-$STD uv venv --python $UV_PYTHON_VERSION /opt/adventurelog/backend/server/venv
+$STD uv venv --python $UV_PYTHON_VERSION /opt/adventurelog/backend/server/.venv
 $STD uv pip install --upgrade pip
 $STD uv pip install -r requirements.txt
 $STD uv run python manage.py collectstatic --noinput
@@ -120,7 +120,7 @@ After=network.target postgresql.service
 
 [Service]
 WorkingDirectory=/opt/adventurelog/backend/server
-ExecStart=/opt/adventurelog/backend/server/venv/bin/python manage.py runserver 0.0.0.0:8000
+ExecStart=/opt/adventurelog/backend/server/.venv/bin/python manage.py runserver 0.0.0.0:8000
 Restart=always
 EnvironmentFile=/opt/adventurelog/backend/server/.env
 
