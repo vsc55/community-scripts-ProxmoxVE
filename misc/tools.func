@@ -164,11 +164,7 @@ install_postgresql() {
       msg_info "Stopping PostgreSQL service"
       systemctl stop postgresql
     fi
-
-    msg_info "Removing pgdg repo and old GPG key"
     rm -f /etc/apt/sources.list.d/pgdg.list /etc/apt/trusted.gpg.d/postgresql.gpg
-
-    msg_info "Adding PostgreSQL PGDG repository"
     curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc |
       gpg --dearmor -o /etc/apt/trusted.gpg.d/postgresql.gpg
 
