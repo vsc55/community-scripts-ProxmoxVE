@@ -40,7 +40,9 @@ $STD git clone https://github.com/TandoorRecipes/recipes -b master /opt/tandoor
 mkdir -p /opt/tandoor/{config,api,mediafiles,staticfiles}
 cd /opt/tandoor
 $STD uv venv /opt/tandoor/.venv
-$STD uv pip install -r requirements.txt
+$STD /opt/tandoor/.venv/bin/python -m ensurepip --upgrade
+$STD /opt/tandoor/.venv/bin/python -m pip install --upgrade pip
+$STD /opt/tandoor/.venv/bin/python -m pip install -r requirements.txt
 
 cd /opt/tandoor/vue
 $STD yarn install
@@ -60,7 +62,7 @@ sed -i -e "s|SECRET_KEY=.*|SECRET_KEY=$secret_key|g" \
   -e "s|POSTGRES_USER=.*|POSTGRES_USER=$DB_USER|g" \
   -e "\$a\STATIC_URL=/staticfiles/" /opt/tandoor/.env
 cd /opt/tandoor
-$STD uv run python version.py
+$STD /opt/tandoor/.venv/bin/python -m version.py
 msg_ok "Installed Tandoor"
 
 msg_info "Install/Set up PostgreSQL Database"
@@ -78,9 +80,9 @@ echo -e "Tandoor Database Name: \e[32m$DB_NAME\e[0m" >>~/tandoor.creds
 echo -e "Tandoor Database User: \e[32m$DB_USER\e[0m" >>~/tandoor.creds
 echo -e "Tandoor Database Password: \e[32m$DB_PASS\e[0m" >>~/tandoor.creds
 export $(cat /opt/tandoor/.env | grep "^[^#]" | xargs)
-$STD uv run python manage.py migrate
-$STD uv run python manage.py collectstatic --no-input
-$STD uv run python manage.py collectstatic_js_reverse
+$STD /opt/tandoor/.venv/bin/python -m manage.py migrate
+$STD /opt/tandoor/.venv/bin/python -m manage.py collectstatic --no-input
+$STD /opt/tandoor/.venv/bin/python -m python manage.py collectstatic_js_reverse
 msg_ok "Set up PostgreSQL Database"
 
 msg_info "Creating Services"

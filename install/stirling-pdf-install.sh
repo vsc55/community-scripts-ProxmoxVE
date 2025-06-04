@@ -43,8 +43,10 @@ msg_ok "Installed LibreOffice Components"
 PYTHON_VERSION="3.12" setup_uv
 
 msg_info "Installing Python Dependencies via uv"
-uv venv /opt/stirling/venv
-$STD /opt/stirling/venv/bin/uv pip install \
+$STD uv venv /opt/stirling/.venv
+$STD /opt/stirling/.venv/bin/python -m ensurepip --upgrade
+$STD /opt/stirling/.venv/bin/python -m pip install --upgrade pip
+$STD /opt/stirling/.venv/bin/python -m pip install \
   uno \
   opencv-python-headless \
   unoconv \
