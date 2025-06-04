@@ -49,7 +49,7 @@ NODE_VERSION="22" install_node_and_modules
 msg_info "Installing Change Detection"
 mkdir -p /opt/changedetection
 cd /opt/changedetection
-$STD uv venv .venv
+$STD uv venv /opt/changedetection/.venv
 $STD /opt/changedetection/.venv/bin/uv pip install changedetection.io
 msg_ok "Installed Change Detection"
 

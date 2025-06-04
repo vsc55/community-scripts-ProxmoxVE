@@ -1103,7 +1103,7 @@ function setup_uv() {
         msg_error "Failed to install Python $VERSION_MATCH via uv"
         return 1
       fi
-      msg_ok "Installed Python $VERSION_MATCH via uv"
+      msg_ok "Installed Python $VERSION_MATCH"
     fi
   fi
 }

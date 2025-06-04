@@ -55,7 +55,6 @@ $STD unzip v${RELEASE}.zip
 mv documenso-${RELEASE} /opt/documenso
 cd /opt/documenso
 $STD uv venv /opt/documenso/.venv
-source /opt/documenso/.venv/bin/activate
 $STD /opt/documenso/.venv/bin/uv pip install bcrypt
 mv .env.example /opt/documenso/.env
 sed -i \
