@@ -28,8 +28,10 @@ msg_ok "Installed Dependencies"
 msg_info "Installing LazyLibrarian"
 $STD git clone https://gitlab.com/LazyLibrarian/LazyLibrarian /opt/LazyLibrarian
 cd /opt/LazyLibrarian
-$STD uv venv .venv
-$STD .venv/bin/uv pip install . jaraco.stream python-Levenshtein soupsieve pypdf
+$STD uv venv /opt/LazyLibrarian/.venv
+$STD /opt/LazyLibrarian/.venv/bin/python -m ensurepip --upgrade
+$STD /opt/LazyLibrarian/.venv/bin/python -m pip install --upgrade pip
+$STD /opt/LazyLibrarian/.venv/bin/python -m pip install . jaraco.stream python-Levenshtein soupsieve pypdf
 msg_ok "Installed LazyLibrarian"
 
 msg_info "Creating Service"

@@ -32,8 +32,10 @@ msg_ok "Installed Dependencies"
 msg_info "Installing Medusa"
 $STD git clone https://github.com/pymedusa/Medusa.git /opt/medusa
 cd /opt/medusa
-$STD uv venv .venv
-$STD .venv/bin/uv pip install .
+$STD uv venv /opt/medusa/.venv
+$STD /opt/LazyLibrarian/.venv/bin/python -m ensurepip --upgrade
+$STD /opt/LazyLibrarian/.venv/bin/python -m pip install --upgrade pip
+$STD /opt/LazyLibrarian/.venv/bin/python -m pip install .
 msg_ok "Installed Medusa"
 
 msg_info "Creating Service"

@@ -22,9 +22,10 @@ curl -fsSL "https://github.com/Kometa-Team/Kometa/archive/refs/tags/v${RELEASE}.
 tar -xzf "$tmp_file"
 mv "Kometa-${RELEASE}" /opt/kometa
 cd /opt/kometa
-
-$STD uv venv .venv
-$STD .venv/bin/uv pip install -r requirements.txt
+$STD uv venv /home/wger/.venv
+$STD /opt/kometa/.venv/bin/python -m ensurepip --upgrade
+$STD /opt/kometa/.venv/bin/python -m pip install --upgrade pip
+$STD /opt/kometa/.venv/bin/python -m pip install -r requirements.txt
 mkdir -p config/assets
 cp config/config.yml.template config/config.yml
 echo "$RELEASE" >/opt/kometa_version.txt
