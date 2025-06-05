@@ -55,7 +55,9 @@ $STD unzip v${RELEASE}.zip
 mv documenso-${RELEASE} /opt/documenso
 cd /opt/documenso
 $STD uv venv /opt/documenso/.venv
-$STD uv pip install bcrypt
+$STD /opt/documenso/.venv/bin/python -m ensurepip --upgrade
+$STD /opt/documenso/.venv/bin/python -m pip install --upgrade pip
+$STD /opt/documenso/.venv/bin/python -m pip install bcrypt
 mv .env.example /opt/documenso/.env
 sed -i \
   -e "s|^NEXTAUTH_SECRET=.*|NEXTAUTH_SECRET='$(openssl rand -base64 32 | tr -dc 'a-zA-Z0-9' | cut -c1-32)'|" \

@@ -23,7 +23,9 @@ msg_info "Installing Deluge"
 mkdir -p /opt/deluge
 cd /opt/deluge
 $STD uv venv /opt/deluge/.venv
-$STD uv pip install "deluge[all]" libtorrent
+$STD /opt/prometheus-pve-exporter/.venv/bin/python -m ensurepip --upgrade
+$STD /opt/prometheus-pve-exporter/.venv/bin/python -m pip install --upgrade pip
+$STD /opt/prometheus-pve-exporter/.venv/bin/python -m pip install deluge libtorrent
 msg_ok "Installed Deluge"
 
 msg_info "Creating Service"
@@ -58,7 +60,8 @@ ExecStart=/opt/deluge/.venv/bin/deluge-web -d
 Restart=on-failure
 
 [Install]
-WantedBy=multi-u
+WantedBy=multi-user.target
+EOF
 
 systemctl enable --now -q deluged.service
 systemctl enable --now -q deluge-web.service

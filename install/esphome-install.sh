@@ -24,7 +24,9 @@ mkdir -p /opt/esphome
 mkdir -p /root/config
 cd /opt/esphome
 $STD uv venv /opt/esphome/.venv
-$STD uv pip install esphome tornado esptool
+$STD /opt/esphome/.venv/bin/python -m ensurepip --upgrade
+$STD /opt/esphome/.venv/bin/python -m pip install --upgrade pip
+$STD /opt/esphome/.venv/bin/python -m pip install esphome tornado esptool
 msg_ok "Setup and Installed ESPHome"
 
 msg_info "Creating Service"
