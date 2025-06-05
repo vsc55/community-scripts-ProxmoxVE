@@ -1081,31 +1081,64 @@ function setup_uv() {
   rm -rf "$TMP_DIR"
   ensure_usr_local_bin_persist
   msg_ok "uv $LATEST_VERSION installed"
+}
 
-  # Optional: install specific Python version
-  if [[ -n "${PYTHON_VERSION:-}" ]]; then
-    $STD msg_info "Ensuring Python $PYTHON_VERSION is available via uv..."
+# ------------------------------------------------------------------------------
+# Creates a uv-based venv with optional Python version and installs dependencies
+# ------------------------------------------------------------------------------
 
-    local VERSION_MATCH
-    VERSION_MATCH=$(uv python list --only-downloads |
-      grep -E "^cpython-${PYTHON_VERSION//./\\.}\.[0-9]+-linux" |
-      cut -d'-' -f2 | sort -V | tail -n1)
+function setup_uv_venv() {
+  local VENV_FOLDER="${VENV_FOLDER:-/opt/app/.venv}"
+  local REQUIREMENTS_FILE="${REQUIREMENTS_FILE:-requirements.txt}"
+  local ENABLE_PIP_UPGRADE="${ENABLE_PIP_UPGRADE:-1}"
+  local ENABLE_ENSUREPIP="${ENABLE_ENSUREPIP:-1}"
 
-    if [[ -z "$VERSION_MATCH" ]]; then
-      msg_error "No matching Python $PYTHON_VERSION.x version found via uv"
+  # Fallback auf globale PYTHON_VERSION
+  local PYTHON_VERSION="${PYTHON_VERSION:-}"
+
+  setup_uv || return 1
+
+  # Wenn PYTHON_VERSION gesetzt, installiere gezielt
+  if [[ -n "$PYTHON_VERSION" ]]; then
+    export PYTHON_VERSION="$PYTHON_VERSION"
+    setup_uv || return 1
+  fi
+
+  $STD msg_info "Creating uv venv in $VENV_FOLDER"
+  if ! $STD uv venv "$VENV_FOLDER"; then
+    msg_error "Failed to create uv venv"
+    return 1
+  fi
+
+  local PYTHON="$VENV_FOLDER/bin/python"
+
+  if [[ "$ENABLE_ENSUREPIP" == "1" ]]; then
+    $STD msg_info "Running ensurepip"
+    if ! $STD "$PYTHON" -m ensurepip --upgrade; then
+      msg_error "ensurepip failed"
       return 1
     fi
+  fi
 
-    if uv python list | grep -q "cpython-${VERSION_MATCH}-linux.*uv/python"; then
-      $STD msg_ok "Python $VERSION_MATCH already installed via uv"
-    else
-      if ! $STD uv python install "$VERSION_MATCH"; then
-        msg_error "Failed to install Python $VERSION_MATCH via uv"
-        return 1
-      fi
-      msg_ok "Installed Python $VERSION_MATCH"
+  if [[ "$ENABLE_PIP_UPGRADE" == "1" ]]; then
+    $STD msg_info "Upgrading pip"
+    if ! $STD "$PYTHON" -m pip install --upgrade pip; then
+      msg_error "pip upgrade failed"
+      return 1
     fi
   fi
+
+  if [[ -f "$REQUIREMENTS_FILE" ]]; then
+    $STD msg_info "Installing requirements from $REQUIREMENTS_FILE"
+    if ! $STD "$PYTHON" -m pip install -r "$REQUIREMENTS_FILE"; then
+      msg_error "Failed to install requirements"
+      return 1
+    fi
+  else
+    msg_info "No requirements file found at $REQUIREMENTS_FILE – skipping"
+  fi
+
+  msg_ok "uv venv setup complete in $VENV_FOLDER"
 }
 
 # ------------------------------------------------------------------------------

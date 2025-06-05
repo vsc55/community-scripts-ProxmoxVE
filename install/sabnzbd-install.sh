@@ -19,8 +19,6 @@ $STD apt-get install -y \
   p7zip-full
 msg_ok "Installed Dependencies"
 
-PYTHON_VERSION="3.12" setup_uv
-
 msg_info "Setup Unrar"
 cat <<EOF >/etc/apt/sources.list.d/non-free.list
 deb http://deb.debian.org/debian bookworm main contrib non-free non-free-firmware
@@ -37,10 +35,8 @@ cd /opt/sabnzbd
 temp_file=$(mktemp)
 curl -fsSL "https://github.com/sabnzbd/sabnzbd/releases/download/${RELEASE}/SABnzbd-${RELEASE}-src.tar.gz" -o "$temp_file"
 tar -xzf "$temp_file" -C /opt/sabnzbd --strip-components=1
-$STD uv venv /opt/sabnzbd/.venv
-$STD /opt/sabnzbd/.venv/bin/python -m ensurepip --upgrade
-$STD /opt/sabnzbd/.venv/bin/python -m pip install --upgrade pip
-$STD /opt/sabnzbd/.venv/bin/python -m pip install -r requirements.txt
+setup_uv VENV_FOLDER="/opt/sabnzbd/.venv" REQUIREMENTS_FILE="requirements.txt" PYTHON_VERSION="3.12" setup_uv_venv
+
 echo "${RELEASE}" >/opt/${APPLICATION}_version.txt
 msg_ok "Installed SABnzbd"
 

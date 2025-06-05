@@ -22,7 +22,7 @@ $STD apt-get install -y \
   nginx
 msg_ok "Installed Dependencies"
 
-PYTHON_VERSION="3.12" setup_uv
+setup_uv
 
 msg_info "Installing Babybuddy"
 RELEASE=$(curl -fsSL https://api.github.com/repos/babybuddy/babybuddy/releases/latest | grep "tag_name" | awk '{print substr($2, 3, length($2)-4) }')
@@ -31,6 +31,8 @@ mkdir -p /opt/{babybuddy,data}
 curl -fsSL "https://github.com/babybuddy/babybuddy/archive/refs/tags/v${RELEASE}.tar.gz" -o "$temp_file"
 tar zxf "$temp_file" --strip-components=1 -C /opt/babybuddy
 cd /opt/babybuddy
+setup_uv
+
 $STD uv venv /opt/babybuddy/.venv
 $STD /opt/babybuddy/.venv/bin/python -m ensurepip --upgrade
 $STD /opt/babybuddy/.venv/bin/python -m pip install --upgrade pip
