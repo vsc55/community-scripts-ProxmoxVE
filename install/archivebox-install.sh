@@ -35,9 +35,10 @@ adduser --system --shell /bin/bash --gecos 'Archive Box User' --group --disabled
 
 sudo -u archivebox bash
 cd /opt/archivebox
-uv venv --python 3 .venv
-uv pip install "archivebox[all]"
-uv pip install playwright
+$STD uv venv /opt/archivebox/.venv
+$STD /opt/archivebox/.venv/bin/python -m ensurepip --upgrade
+$STD /opt/archivebox/.venv/bin/python -m pip install --upgrade pip
+$STD /opt/archivebox/.venv/bin/python -m pip install archivebox playwright
 
 chown -R archivebox:archivebox /opt/archivebox
 chmod -R 755 /opt/archivebox

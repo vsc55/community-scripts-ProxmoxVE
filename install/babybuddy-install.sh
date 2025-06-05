@@ -31,8 +31,10 @@ mkdir -p /opt/{babybuddy,data}
 curl -fsSL "https://github.com/babybuddy/babybuddy/archive/refs/tags/v${RELEASE}.tar.gz" -o "$temp_file"
 tar zxf "$temp_file" --strip-components=1 -C /opt/babybuddy
 cd /opt/babybuddy
-$STD uv venv .venv
-$STD .venv/bin/uv pip install -r requirements.txt
+$STD uv venv /opt/babybuddy/.venv
+$STD /opt/babybuddy/.venv/bin/python -m ensurepip --upgrade
+$STD /opt/babybuddy/.venv/bin/python -m pip install --upgrade pip
+$STD /opt/babybuddy/.venv/bin/python -m pip install -r requirements.txt
 
 cp babybuddy/settings/production.example.py babybuddy/settings/production.py
 SECRET_KEY=$(openssl rand -base64 32 | tr -dc 'a-zA-Z0-9' | cut -c1-32)
@@ -43,7 +45,8 @@ sed -i \
   babybuddy/settings/production.py
 
 export DJANGO_SETTINGS_MODULE=babybuddy.settings.production
-$STD /opt/babybuddy/.venv/bin/python manage.py migrate
+cd /opt/babybuddy
+$STD /opt/babybuddy/.venv/bin/python -m manage.py migrate
 chown -R www-data:www-data /opt/data
 chmod 640 /opt/data/db.sqlite3
 chmod 750 /opt/data
