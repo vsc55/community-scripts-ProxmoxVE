@@ -36,9 +36,12 @@ cd /opt/metube/ui
 $STD npm install
 $STD node_modules/.bin/ng build
 cd /opt/metube
-$STD uv venv .venv
-$STD .venv/bin/uv pip install pipenv
-$STD .venv/bin/pipenv install
+$STD uv venv /opt/motioneye/.venv
+$STD /opt/metube/.venv/bin/python -m ensurepip --upgrade
+$STD /opt/metube/.venv/bin/python -m pip install --upgrade pip
+$STD /opt/metube/.venv/bin/python -m pip install pipenv
+$STD /opt/metube/.venv/bin/pipenv install
+
 mkdir -p /opt/metube_downloads /opt/metube_downloads/.metube /opt/metube_downloads/music /opt/metube_downloads/videos
 cat <<EOF >/opt/metube/.env
 DOWNLOAD_DIR=/opt/metube_downloads

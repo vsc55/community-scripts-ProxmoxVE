@@ -49,10 +49,9 @@ curl -fsSL https://github.com/leiweibau/Pi.Alert/raw/main/tar/pialert_latest.tar
 rm -rf /var/lib/ieee-data /var/www/html/index.html
 cd /opt/pialert
 $STD uv venv /opt/pialert/.venv
-$STD uv pip install mac-vendor-lookup
-$STD uv pip install fritzconnection
-$STD uv pip install cryptography
-$STD uv pip install pyunifi
+$STD /opt/pialert/.venv/bin/python -m ensurepip --upgrade
+$STD /opt/pialert/.venv/bin/python -m pip install --upgrade pip
+$STD /opt/pialert/.venv/bin/python -m pip install mac-vendor-lookup fritzconnection cryptography pyunifi
 sed -i -e 's#^sudo cp -n /usr/share/ieee-data/.* /var/lib/ieee-data/#\# &#' -e '/^sudo mkdir -p 2_backup$/s/^/# /' -e '/^sudo cp \*.txt 2_backup$/s/^/# /' -e '/^sudo cp \*.csv 2_backup$/s/^/# /' /opt/pialert/back/update_vendors.sh
 mv /var/www/html/index.lighttpd.html /var/www/html/index.lighttpd.html.old
 ln -s /usr/share/ieee-data/ /var/lib/

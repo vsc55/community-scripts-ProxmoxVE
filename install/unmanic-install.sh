@@ -37,7 +37,9 @@ msg_info "Installing Unmanic"
 mkdir -p /opt/unmanic
 cd /opt/unmanic
 $STD uv venv /opt/unmanic/.venv
-$STD uv pip install unmanic
+$STD /opt/unmanic/.venv/bin/python -m ensurepip --upgrade
+$STD /opt/unmanic/.venv/bin/python -m pip install --upgrade pip
+$STD /opt/unmanic/.venv/bin/python -m pip install unmanic
 sed -i -e 's/^sgx:x:104:$/render:x:104:root/' -e 's/^render:x:106:root$/sgx:x:106:/' /etc/group
 msg_ok "Installed Unmanic"
 

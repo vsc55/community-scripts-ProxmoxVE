@@ -40,12 +40,15 @@ mv wger-$RELEASE /home/wger/src
 cd /home/wger/src
 $STD /home/wger/.venv/bin/wger create-settings --database-path /home/wger/db/database.sqlite
 $STD uv venv /home/wger/.venv
-$STD uv pip install -r requirements_prod.txt
-$STD uv pip install -e .
+$STD /home/wger/.venv/bin/python -m ensurepip --upgrade
+$STD /home/wger/.venv/bin/python -m pip install --upgrade pip
+$STD /home/wger/.venv/bin/python -m pip install -r requirements_prod.txt
+$STD /home/wger/.venv/bin/python -m pip install -e .
 sed -i "s#home/wger/src/media#home/wger/media#g" /home/wger/src/settings.py
 sed -i "/MEDIA_ROOT = '\/home\/wger\/media'/a STATIC_ROOT = '/home/wger/static'" /home/wger/src/settings.py
 $STD /home/wger/.venv/bin/wger bootstrap
-$STD uv run python manage.py collectstatic
+cd /home/wger/src/
+$STD /home/wger/.venv/bin/python -m manage.py collectstatic
 echo "${RELEASE}" >/opt/wger_version.txt
 msg_ok "Finished setting up wger"
 
