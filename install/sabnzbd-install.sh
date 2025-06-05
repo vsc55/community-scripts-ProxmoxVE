@@ -35,8 +35,7 @@ cd /opt/sabnzbd
 temp_file=$(mktemp)
 curl -fsSL "https://github.com/sabnzbd/sabnzbd/releases/download/${RELEASE}/SABnzbd-${RELEASE}-src.tar.gz" -o "$temp_file"
 tar -xzf "$temp_file" -C /opt/sabnzbd --strip-components=1
-setup_uv VENV_FOLDER="/opt/sabnzbd/.venv" REQUIREMENTS_FILE="requirements.txt" PYTHON_VERSION="3.12" setup_uv_venv
-
+VENV_FOLDER="/opt/sabnzbd/.venv" REQUIREMENTS_FILE="requirements.txt" PYTHON_VERSION="3.12" setup_uv_venv
 echo "${RELEASE}" >/opt/${APPLICATION}_version.txt
 msg_ok "Installed SABnzbd"
 
