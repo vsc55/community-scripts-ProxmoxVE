@@ -91,7 +91,7 @@ DJANGO_USER=Admin
 DJANGO_PASS=$(openssl rand -base64 18 | tr -dc 'a-zA-Z0-9' | cut -c1-13)
 
 source /opt/netbox/venv/bin/activate
-$STD /opt/netbox/.venv/bin/python /opt/netbox/netbox/manage.py shell <<EOF
+$STD /opt/netbox/.venv/bin/python /opt/netbox/netbox/manage shell <<EOF
 from django.contrib.auth import get_user_model
 UserModel = get_user_model()
 user = UserModel.objects.create_user('$DJANGO_USER', password='$DJANGO_PASS')

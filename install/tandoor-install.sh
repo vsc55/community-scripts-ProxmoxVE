@@ -80,9 +80,9 @@ echo -e "Tandoor Database Name: \e[32m$DB_NAME\e[0m" >>~/tandoor.creds
 echo -e "Tandoor Database User: \e[32m$DB_USER\e[0m" >>~/tandoor.creds
 echo -e "Tandoor Database Password: \e[32m$DB_PASS\e[0m" >>~/tandoor.creds
 export $(cat /opt/tandoor/.env | grep "^[^#]" | xargs)
-$STD /opt/tandoor/.venv/bin/python -m manage.py migrate
-$STD /opt/tandoor/.venv/bin/python -m manage.py collectstatic --no-input
-$STD /opt/tandoor/.venv/bin/python -m python manage.py collectstatic_js_reverse
+$STD /opt/tandoor/.venv/bin/python -m manage migrate
+$STD /opt/tandoor/.venv/bin/python -m manage collectstatic --no-input
+$STD /opt/tandoor/.venv/bin/python -m python manage collectstatic_js_reverse
 msg_ok "Set up PostgreSQL Database"
 
 msg_info "Creating Services"

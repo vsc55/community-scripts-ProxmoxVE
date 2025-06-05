@@ -82,9 +82,9 @@ $STD uv venv /opt/adventurelog/backend/server/.venv
 $STD /opt/adventurelog/backend/server/.venv/bin/python -m ensurepip --upgrade
 $STD /opt/adventurelog/backend/server/.venv/bin/python -m pip install --upgrade pip
 $STD /opt/adventurelog/backend/server/.venv/bin/python -m pip install -r requirements.txt
-$STD /opt/adventurelog/backend/server/.venv/bin/python -m  manage.py collectstatic --noinput
-$STD /opt/adventurelog/backend/server/.venv/bin/python -m  manage.py migrate
-$STD /opt/adventurelog/backend/server/.venv/bin/python -m  manage.py download-countries
+$STD /opt/adventurelog/backend/server/.venv/bin/python -m manage collectstatic --noinput
+$STD /opt/adventurelog/backend/server/.venv/bin/python -m manage migrate
+$STD /opt/adventurelog/backend/server/.venv/bin/python -m manage download-countries
 cat <<EOF >/opt/adventurelog/frontend/.env
 PUBLIC_SERVER_URL=http://$LOCAL_IP:8000
 BODY_SIZE_LIMIT=Infinity
@@ -97,7 +97,8 @@ echo "${RELEASE}" >"/opt/${APPLICATION}_version.txt"
 msg_ok "Installed AdventureLog"
 
 msg_info "Setting up Django Admin"
-$STD /opt/adventurelog/backend/server/.venv/bin/python -m /opt/adventurelog/backend/server/manage.py shell <<EOF
+cd /opt/adventurelog/backend/server
+$STD .venv/bin/python -m manage shell <<EOF
 from django.contrib.auth import get_user_model
 UserModel = get_user_model()
 user = UserModel.objects.create_user('$DJANGO_ADMIN_USER', password='$DJANGO_ADMIN_PASS')
@@ -121,7 +122,7 @@ After=network.target postgresql.service
 
 [Service]
 WorkingDirectory=/opt/adventurelog/backend/server
-ExecStart=/opt/adventurelog/backend/server/.venv/bin/python manage.py runserver 0.0.0.0:8000
+ExecStart=/opt/adventurelog/backend/server/.venv/bin/python -m manage runserver 0.0.0.0:8000
 Restart=always
 EnvironmentFile=/opt/adventurelog/backend/server/.env
 

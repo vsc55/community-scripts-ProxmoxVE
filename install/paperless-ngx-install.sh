@@ -113,7 +113,7 @@ sed -i -e "s|#PAPERLESS_DBUSER=paperless|PAPERLESS_DBUSER=$DB_USER|" /opt/paperl
 sed -i -e "s|#PAPERLESS_DBPASS=paperless|PAPERLESS_DBPASS=$DB_PASS|" /opt/paperless/paperless.conf
 sed -i -e "s|#PAPERLESS_SECRET_KEY=change-me|PAPERLESS_SECRET_KEY=$SECRET_KEY|" /opt/paperless/paperless.conf
 cd /opt/paperless/src
-$STD /opt/paperless/.venv/bin/python manage.py migrate
+$STD /opt/paperless/.venv/bin/python manage migrate
 msg_ok "Set up PostgreSQL database"
 
 read -r -p "${TAB3}Would you like to add Adminer? <y/N> " prompt
@@ -135,7 +135,7 @@ fi
 
 msg_info "Setting up admin Paperless-ngx User & Password"
 ## From https://github.com/linuxserver/docker-paperless-ngx/blob/main/root/etc/cont-init.d/99-migrations
-cat <<EOF | /opt/paperless/.venv/bin/python /opt/paperless/src/manage.py shell
+cat <<EOF | /opt/paperless/.venv/bin/python /opt/paperless/src/manage shell
 from django.contrib.auth import get_user_model
 UserModel = get_user_model()
 user = UserModel.objects.create_user('admin', password='$DB_PASS')
@@ -185,7 +185,7 @@ Requires=redis.service
 [Service]
 WorkingDirectory=/opt/paperless/src
 ExecStartPre=/bin/sleep 2
-ExecStart=/opt/paperless/.venv/bin/python manage.py document_consumer
+ExecStart=/opt/paperless/.venv/bin/python manage document_consumer
 
 [Install]
 WantedBy=multi-user.target

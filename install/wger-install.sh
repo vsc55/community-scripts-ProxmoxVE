@@ -48,7 +48,7 @@ sed -i "s#home/wger/src/media#home/wger/media#g" /home/wger/src/settings.py
 sed -i "/MEDIA_ROOT = '\/home\/wger\/media'/a STATIC_ROOT = '/home/wger/static'" /home/wger/src/settings.py
 $STD /home/wger/.venv/bin/wger bootstrap
 cd /home/wger/src/
-$STD /home/wger/.venv/bin/python -m manage.py collectstatic
+$STD /home/wger/.venv/bin/python -m manage collectstatic
 echo "${RELEASE}" >/opt/wger_version.txt
 msg_ok "Finished setting up wger"
 

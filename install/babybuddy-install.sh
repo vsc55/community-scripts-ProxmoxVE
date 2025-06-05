@@ -46,7 +46,7 @@ sed -i \
 
 export DJANGO_SETTINGS_MODULE=babybuddy.settings.production
 cd /opt/babybuddy
-$STD /opt/babybuddy/.venv/bin/python -m manage.py migrate
+$STD /opt/babybuddy/.venv/bin/python -m manage migrate
 chown -R www-data:www-data /opt/data
 chmod 640 /opt/data/db.sqlite3
 chmod 750 /opt/data
