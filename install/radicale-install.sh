@@ -24,7 +24,9 @@ msg_info "Setting up Radicale"
 mkdir -p /opt/radicale/{users}
 cd /opt/radicale
 $STD uv venv /opt/radicale/.venv
-$STD uv pip install --upgrade https://github.com/Kozea/Radicale/archive/master.tar.gz
+$STD /opt/radicale/.venv/bin/python -m ensurepip --upgrade
+$STD /opt/radicale/.venv/bin/python -m pip install --upgrade pip
+$STD /opt/radicale/.venv/bin/python -m pip install --upgrade https://github.com/Kozea/Radicale/archive/master.tar.gz
 RNDPASS=$(openssl rand -base64 18 | tr -dc 'a-zA-Z0-9' | head -c13)
 $STD htpasswd -c -b -5 /opt/radicale/users admin "$RNDPASS"
 {

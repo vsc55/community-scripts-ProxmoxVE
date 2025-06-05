@@ -56,6 +56,9 @@ chown --recursive netbox /opt/netbox/netbox/reports/
 chown --recursive netbox /opt/netbox/netbox/scripts/
 
 mv /opt/netbox/netbox/netbox/configuration_example.py /opt/netbox/netbox/netbox/configuration.py
+$STD uv venv /opt/netbox/.venv
+$STD /opt/netbox/.venv/bin/python -m ensurepip --upgrade
+$STD /opt/netbox/.venv/bin/python -m pip install --upgrade pip
 
 SECRET_KEY=$(/opt/netbox/.venv/bin/python /opt/netbox/netbox/generate_secret_key.py)
 ESCAPED_SECRET_KEY=$(printf '%s\n' "$SECRET_KEY" | sed 's/[&/\]/\\&/g')

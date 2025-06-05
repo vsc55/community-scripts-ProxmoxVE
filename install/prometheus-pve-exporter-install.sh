@@ -18,8 +18,11 @@ PYTHON_VERSION="3.12" setup_uv
 msg_info "Installing Prometheus Proxmox VE Exporter"
 mkdir -p /opt/prometheus-pve-exporter
 cd /opt/prometheus-pve-exporter
+
 $STD uv venv /opt/prometheus-pve-exporter/.venv
-$STD uv pip install prometheus-pve-exporter
+$STD /opt/prometheus-pve-exporter/.venv/bin/python -m ensurepip --upgrade
+$STD /opt/prometheus-pve-exporter/.venv/bin/python -m pip install --upgrade pip
+$STD /opt/prometheus-pve-exporter/.venv/bin/python -m pip install prometheus-pve-exporter
 cat <<EOF >/opt/prometheus-pve-exporter/pve.yml
 default:
     user: prometheus@pve

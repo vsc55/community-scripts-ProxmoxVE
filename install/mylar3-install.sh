@@ -29,8 +29,10 @@ mkdir -p /opt/mylar3-data
 RELEASE=$(curl -fsSL https://api.github.com/repos/mylar3/mylar3/releases/latest | jq -r '.tag_name')
 curl -fsSL "https://github.com/mylar3/mylar3/archive/refs/tags/${RELEASE}.tar.gz" | tar -xz --strip-components=1 -C /opt/mylar3
 cd /opt/mylar3
-$STD uv venv .venv
-$STD .venv/bin/uv pip install --no-cache-dir -r requirements.txt
+$STD uv venv /opt/mylar3/.venv
+$STD /opt/mylar3/.venv/bin/python -m ensurepip --upgrade
+$STD /opt/mylar3/.venv/bin/python -m pip install --upgrade pip
+$STD /opt/mylar3/.venv/bin/python -m pip install -r requirements.txt
 echo "${RELEASE}" >/opt/${APPLICATION}_version.txt
 msg_ok "Installed ${APPLICATION}"
 
