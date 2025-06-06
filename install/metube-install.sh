@@ -27,7 +27,7 @@ $STD apt-get install -y --no-install-recommends \
   ca-certificates
 msg_ok "Installed Dependencies"
 
-PYTHON_VERSION="3.12" setup_uv
+PYTHON_VERSION="3.13" setup_uv
 NODE_VERSION="22" install_node_and_modules
 
 msg_info "Installing MeTube"
