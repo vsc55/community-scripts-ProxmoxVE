@@ -35,7 +35,7 @@ $STD apt-get update
 $STD uv venv /opt/motioneye/.venv
 $STD /opt/motioneye/.venv/bin/python -m ensurepip --upgrade
 $STD /opt/motioneye/.venv/bin/python -m pip install --upgrade pip
-$STD /opt/motioneye/.venv/bin/python -m pip install git+https://github.com/motioneye-project/motioneye.git@dev
+$STD /opt/motioneye/.venv/bin/python -m pip install --pre motioneye
 
 mkdir -p /etc/motioneye
 chown -R root:root /etc/motioneye
