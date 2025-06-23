@@ -36,7 +36,7 @@ cd /opt/metube/ui
 $STD npm install
 $STD node_modules/.bin/ng build
 cd /opt/metube
-$STD uv venv /opt/motioneye/.venv
+$STD uv venv /opt/metube/.venv
 $STD /opt/metube/.venv/bin/python -m ensurepip --upgrade
 $STD /opt/metube/.venv/bin/python -m pip install --upgrade pip
 $STD /opt/metube/.venv/bin/python -m pip install pipenv
