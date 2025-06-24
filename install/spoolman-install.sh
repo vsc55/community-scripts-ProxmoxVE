@@ -27,8 +27,6 @@ fetch_and_deploy_gh_release "spoolman" "Donkie/Spoolman" "prebuild" "latest" "/o
 msg_info "Installing Spoolman"
 cd /opt/spoolman
 $STD uv venv /opt/spoolman/.venv
-$STD /opt/spoolman/.venv/bin/python -m ensurepip --upgrade
-$STD /opt/spoolman/.venv/bin/python -m pip install --upgrade pip
 $STD /opt/spoolman/.venv/bin/python -m pip install -r requirements.txt
 curl -fsSL "https://raw.githubusercontent.com/Donkie/Spoolman/master/.env.example" -o ".env"
 msg_ok "Installed Spoolman"
