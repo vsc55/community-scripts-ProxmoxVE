@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-source <(curl -fsSL https://raw.githubusercontent.com/community-scripts/ProxmoxVE/python_to_uv/misc/build.func)
+source <(curl -fsSL https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/misc/build.func)
 # Copyright (c) 2021-2025 tteck
 # Author: MickLesk (Canbiz)
 # License: MIT | https://github.com/community-scripts/ProxmoxVE/raw/main/LICENSE
@@ -78,6 +78,7 @@ function update_script() {
     $STD /opt/metube/.venv/bin/python -m pip install --upgrade pip
     $STD /opt/metube/.venv/bin/python -m pip install pipenv
     $STD /opt/metube/.venv/bin/pipenv install
+    $STD /opt/metube/.venv/bin/pipenv update yt-dlp
 
     msg_info "Patching systemd Service"
     cat <<EOF >/etc/systemd/system/metube.service

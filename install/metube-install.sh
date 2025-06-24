@@ -41,6 +41,7 @@ $STD /opt/metube/.venv/bin/python -m ensurepip --upgrade
 $STD /opt/metube/.venv/bin/python -m pip install --upgrade pip
 $STD /opt/metube/.venv/bin/python -m pip install pipenv
 $STD /opt/metube/.venv/bin/pipenv install
+$STD /opt/metube/.venv/bin/pipenv update yt-dlp
 
 mkdir -p /opt/metube_downloads /opt/metube_downloads/.metube /opt/metube_downloads/music /opt/metube_downloads/videos
 cat <<EOF >/opt/metube/.env
