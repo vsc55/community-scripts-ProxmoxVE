@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 
 # Copyright (c) 2021-2025 tteck
-# Author: tteck
-# Co-Author: MickLesk (Canbiz)
+# Author: MickLesk (CanbiZ)
 # License: MIT | https://github.com/community-scripts/ProxmoxVE/raw/main/LICENSE
 # Source: https://github.com/Donkie/Spoolman
 
@@ -23,19 +22,16 @@ $STD apt-get install -y \
 msg_ok "Installed Dependencies"
 
 PYTHON_VERSION="3.12" setup_uv
+fetch_and_deploy_gh_release "spoolman" "Donkie/Spoolman" "prebuild" "latest" "/opt/spoolman" "spoolman.zip"
 
 msg_info "Installing Spoolman"
-RELEASE=$(curl -fsSL https://github.com/Donkie/Spoolman/releases/latest | grep "title>Release" | cut -d " " -f 4)
-cd /opt
-curl -fsSL "https://github.com/Donkie/Spoolman/releases/download/$RELEASE/spoolman.zip" -o "spoolman.zip"
-$STD unzip spoolman.zip -d spoolman
-rm -f spoolman.zip
-cd spoolman
+cd /opt/spoolman
 $STD uv venv /opt/spoolman/.venv
-$STD uv pip install -r requirements.txt
+$STD /opt/spoolman/.venv/bin/python -m ensurepip --upgrade
+$STD /opt/spoolman/.venv/bin/python -m pip install --upgrade pip
+$STD /opt/spoolman/.venv/bin/python -m pip install -r requirements.txt
 
 curl -fsSL "https://raw.githubusercontent.com/Donkie/Spoolman/master/.env.example" -o ".env"
-echo "${RELEASE}" >/opt/${APPLICATION}_version.txt
 msg_ok "Installed Spoolman"
 
 msg_info "Creating Service"
