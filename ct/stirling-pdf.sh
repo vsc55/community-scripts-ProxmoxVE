@@ -27,31 +27,38 @@ function update_script() {
     msg_error "No ${APP} Installation Found!"
     exit
   fi
-  msg_info "Updating ${APP}"
-  systemctl stop stirlingpdf
-  if [[ -n $(dpkg -l | grep -w ocrmypdf) ]] && [[ -z $(dpkg -l | grep -w qpdf) ]]; then
-    $STD apt-get remove -y ocrmypdf
-    $STD apt-get install -y qpdf
+  RELEASE=$(curl -fsSL https://api.github.com/repos/Stirling-Tools/Stirling-PDF/releases/latest | grep "tag_name" | awk '{print substr($2, 2, length($2)-3) }')
+  if [[ "${RELEASE}" != "$(cat ~/.stirling-pdf 2>/dev/null)" ]] || [[ ! -f ~/.stirling-pdf ]]; then
+
+    msg_info "Stopping Services"
+    systemctl stop stirlingpdf
+    systemctl list-units --full -all | grep -q libreoffice-listener.service && systemctl stop libreoffice-listener
+    systemctl list-units --full -all | grep -q unoserver.service && systemctl stop unoserver
+    msg_ok "Stopped Services"
+
+    if [[ -f ~/.Stirling-PDF-login ]]; then
+      USE_ORIGINAL_FILENAME=true fetch_and_deploy_gh_release "stirling-pdf" "Stirling-Tools/Stirling-PDF" "singlefile" "latest" "/opt/Stirling-PDF" "Stirling-PDF-with-login.jar"
+      mv /opt/Stirling-PDF/Stirling-PDF-with-login.jar /opt/Stirling-PDF/Stirling-PDF.jar
+    else
+      USE_ORIGINAL_FILENAME=true fetch_and_deploy_gh_release "stirling-pdf" "Stirling-Tools/Stirling-PDF" "singlefile" "latest" "/opt/Stirling-PDF" "Stirling-PDF.jar"
+    fi
+
+    msg_info "Refreshing Font Cache"
+    $STD fc-cache -fv
+    msg_ok "Font Cache Updated"
+
+    msg_info "Starting Services"
+    systemctl start stirlingpdf
+    systemctl list-unit-files | grep -q libreoffice-listener.service && systemctl start libreoffice-listener
+    systemctl list-unit-files | grep -q unoserver.service && systemctl start unoserver
+    msg_ok "Started Services"
+
+    msg_ok "Update Successful"
+  else
+    msg_ok "No update required. ${APP} is already at v${RELEASE}"
   fi
-  RELEASE=$(curl -fsSL https://api.github.com/repos/Stirling-Tools/Stirling-PDF/releases/latest | grep "tag_name" | awk '{print substr($2, 3, length($2)-4) }')
-  curl -fsSL "https://github.com/Stirling-Tools/Stirling-PDF/archive/refs/tags/v$RELEASE.tar.gz" -o $(basename "https://github.com/Stirling-Tools/Stirling-PDF/archive/refs/tags/v$RELEASE.tar.gz")
-  tar -xzf v$RELEASE.tar.gz
-  cd Stirling-PDF-$RELEASE
-  chmod +x ./gradlew
-  $STD ./gradlew build -x spotlessApply -x spotlessCheck -x test -x sonarqube
-  rm -rf /opt/Stirling-PDF/Stirling-PDF-*.jar
-  cp -r ./stirling-pdf/build/libs/*.jar /opt/Stirling-PDF/Stirling-PDF-$RELEASE.jar
-  cp -r scripts /opt/Stirling-PDF/
-  cp -r pipeline /opt/Stirling-PDF/
-  cp -r stirling-pdf/src/main/resources/static/fonts/*.ttf /usr/share/fonts/opentype/noto/
-  cd ~
-  rm -rf Stirling-PDF-$RELEASE v$RELEASE.tar.gz
-  ln -sf /opt/Stirling-PDF/Stirling-PDF-$RELEASE.jar /opt/Stirling-PDF/Stirling-PDF.jar
-  systemctl start stirlingpdf
-  msg_ok "Updated ${APP} to v$RELEASE"
   exit
 }
-
 start
 build_container
 description
