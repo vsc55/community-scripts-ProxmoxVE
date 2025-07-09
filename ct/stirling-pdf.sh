@@ -29,11 +29,16 @@ function update_script() {
   fi
   RELEASE=$(curl -fsSL https://api.github.com/repos/Stirling-Tools/Stirling-PDF/releases/latest | grep "tag_name" | awk '{print substr($2, 2, length($2)-3) }')
   if [[ "${RELEASE}" != "$(cat ~/.stirling-pdf 2>/dev/null)" ]] || [[ ! -f ~/.stirling-pdf ]]; then
+    if [[ ! -f /etc/systemd/system/unoserver.service ]]; then
+      msg_custom "⚠️ " "\e[33m" "Legacy installation detected – please recreate the container using the latest install script."
+      exit 0
+    fi
+
+    PYTHON_VERSION="3.12" setup_uv
+    JAVA_VERSION="21" setup_java
 
     msg_info "Stopping Services"
-    systemctl stop stirlingpdf
-    systemctl list-units --full -all | grep -q libreoffice-listener.service && systemctl stop libreoffice-listener
-    systemctl list-units --full -all | grep -q unoserver.service && systemctl stop unoserver
+    systemctl stop stirlingpdf libreoffice-listener unoserver
     msg_ok "Stopped Services"
 
     if [[ -f ~/.Stirling-PDF-login ]]; then
@@ -48,9 +53,7 @@ function update_script() {
     msg_ok "Font Cache Updated"
 
     msg_info "Starting Services"
-    systemctl start stirlingpdf
-    systemctl list-unit-files | grep -q libreoffice-listener.service && systemctl start libreoffice-listener
-    systemctl list-unit-files | grep -q unoserver.service && systemctl start unoserver
+    systemctl start stirlingpdf libreoffice-listener unoserver
     msg_ok "Started Services"
 
     msg_ok "Update Successful"
