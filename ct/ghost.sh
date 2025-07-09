@@ -24,7 +24,11 @@ function update_script() {
   check_container_storage
   check_container_resources
 
+  if ! dpkg-query -W -f='${Status}' mariadb-server 2>/dev/null | grep -q "install ok installed"; then
+    setup_mysql
+  fi
   NODE_VERSION="22" setup_nodejs
+
   msg_info "Updating ${APP} LXC"
   if command -v ghost &>/dev/null; then
     current_version=$(ghost version | grep 'Ghost-CLI version' | awk '{print $3}')

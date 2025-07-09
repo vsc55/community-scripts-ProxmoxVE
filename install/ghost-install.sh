@@ -16,7 +16,8 @@ update_os
 msg_info "Installing Dependencies"
 $STD apt-get install -y \
   nginx \
-  ca-certificates
+  ca-certificates \
+  libjemalloc2
 msg_ok "Installed Dependencies"
 
 setup_mysql
