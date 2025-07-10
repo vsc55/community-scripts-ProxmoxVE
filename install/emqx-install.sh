@@ -38,7 +38,7 @@ echo "$LATEST_VERSION" >~/.emqx
 msg_ok "Installed EMQX"
 
 msg_info "Starting EMQX service"
-$STD systemctl enable -q --npow emqx
+$STD systemctl enable -q --now emqx
 msg_ok "Enabled EMQX service"
 
 motd_ssh
