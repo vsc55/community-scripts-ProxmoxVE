@@ -8,7 +8,7 @@
   "type": "ct",
   "updateable": true,
   "privileged": false,
-  "config_path": "/opt/mealie/.env",
+  "config_path": "/opt/mealie/mealie.env",
   "interface_port": 3000,
   "documentation": "https://mealie.io/",
   "website": "https://mealie.io/",
