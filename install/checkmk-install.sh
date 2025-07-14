@@ -13,12 +13,8 @@ setting_up_container
 network_check
 update_os
 
-msg_info "Install Checkmk"
 RELEASE=$(curl -fsSL https://api.github.com/repos/checkmk/checkmk/tags | grep "name" | awk '{print substr($2, 3, length($2)-4) }' | tr ' ' '\n' | grep -Ev 'rc|b' | sort -V | tail -n 1)
-curl -fsSL "https://download.checkmk.com/checkmk/${RELEASE}/check-mk-raw-${RELEASE}_0.bookworm_amd64.deb" -o "/opt/checkmk.deb"
-$STD apt-get install -y /opt/checkmk.deb
-echo "${RELEASE}" >"/opt/checkmk_version.txt"
-msg_ok "Installed Checkmk"
+fetch_and_deploy_gh_release "checkmk" "checkmk/checkmk" "binary" "${RELEASE}"
 
 motd_ssh
 customize
@@ -27,14 +23,13 @@ msg_info "Creating Service"
 PASSWORD=$(omd create monitoring | grep "password:" | awk '{print $NF}')
 $STD omd start
 {
-    echo "Application-Credentials"
-    echo "Username: cmkadmin"
-    echo "Password: $PASSWORD"
+  echo "Application-Credentials"
+  echo "Username: cmkadmin"
+  echo "Password: $PASSWORD"
 } >>~/checkmk.creds
 msg_ok "Created Service"
 
 msg_info "Cleaning up"
-rm -rf /opt/checkmk.deb
 $STD apt-get -y autoremove
 $STD apt-get -y autoclean
 msg_ok "Cleaned"
