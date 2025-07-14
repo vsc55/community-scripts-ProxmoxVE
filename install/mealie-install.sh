@@ -14,7 +14,13 @@ network_check
 update_os
 
 msg_info "Installing Dependencies"
-$STD apt-get install -y build-essential libpq-dev libwebp-dev libsasl2-dev libldap2-dev libssl-dev git
+$STD apt-get install -y \
+  build-essential \
+  libpq-dev \
+  libwebp-dev \
+  libsasl2-dev \
+  libldap2-dev \
+  libssl-dev
 msg_ok "Installed Dependencies"
 
 PYTHON_VERSION="3.12" setup_uv
@@ -92,7 +98,6 @@ msg_ok "Created Start Script"
 msg_info "Building Mealie Backend Wheel"
 cd /opt/mealie
 $STD /opt/mealie/.venv/bin/poetry build --output dist
-
 MEALIE_VERSION=$(/opt/mealie/.venv/bin/poetry version --short)
 $STD /opt/mealie/.venv/bin/poetry export --only=main --extras=pgsql --output=dist/requirements.txt
 echo "mealie[pgsql]==$MEALIE_VERSION \\" >>dist/requirements.txt
