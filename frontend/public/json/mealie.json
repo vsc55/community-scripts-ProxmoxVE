@@ -12,16 +12,16 @@
   "interface_port": 3000,
   "documentation": "https://mealie.io/",
   "website": "https://mealie.io/",
-  "logo": "https://cdn.jsdelivr.net/gh/selfhst/icons/svg/mealie.svg",
-  "description": "Mealie is an open-source self-hosted application.",
+  "logo": "https://cdn.jsdelivr.net/gh/selfhst/icons/webp/mealie.webp",
+  "description": "Mealie is a self hosted recipe manager, meal planner and shopping list with a RestAPI backend and a reactive frontend built in Vue for a pleasant user experience for the whole family. Easily add recipes into your database by providing the URL and Mealie will automatically import the relevant data, or add a family recipe with the UI editor. Mealie also provides an API for interactions from 3rd party applications.",
   "install_methods": [
     {
       "type": "default",
       "script": "ct/mealie.sh",
       "resources": {
-        "cpu": 1,
-        "ram": 1024,
-        "hdd": 2,
+        "cpu": 2,
+        "ram": 2048,
+        "hdd": 10,
         "os": "Debian",
         "version": "12"
       }
