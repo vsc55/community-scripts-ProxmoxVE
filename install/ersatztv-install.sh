@@ -13,8 +13,6 @@ setting_up_container
 network_check
 update_os
 
-FFMPEG_VERSION="latest" FFMPEG_TYPE="full" setup_ffmpeg
-
 msg_info "Setting Up Hardware Acceleration"
 $STD apt-get -y install {va-driver-all,ocl-icd-libopencl1,intel-opencl-icd,vainfo,intel-gpu-tools}
 if [[ "$CTTYPE" == "0" ]]; then
@@ -25,6 +23,15 @@ if [[ "$CTTYPE" == "0" ]]; then
   $STD adduser $(id -u -n) render
 fi
 msg_ok "Set Up Hardware Acceleration"
+
+msg_info "Setup ErsatzTV-FFMPEG"
+curl -fsSL https://github.com/ErsatzTV/ErsatzTV-ffmpeg/releases/download/7.1.1/ffmpeg-n7.1.1-55-gca5c0a959d-linux64-nonfree-7.1.tar.xz -o /tmp/ffmpeg.tar.xz
+mkdir -p /opt/ErsatzTV-FFMPEG
+tar -xf /tmp/ffmpeg.tar.xz --strip-components=1 -C /opt/ErsatzTV-FFMPEG
+ln -sf /opt/ErsatzTV-FFMPEG/bin/ffmpeg /usr/local/bin/ffmpeg
+ln -sf /opt/ErsatzTV-FFMPEG/bin/ffplay /usr/local/bin/ffplay
+ln -sf /opt/ErsatzTV-FFMPEG/bin/ffprobe /usr/local/bin/ffprobe
+msg_ok "Setup ErsatzTV-FFMPEG"
 
 fetch_and_deploy_gh_release "ersatztv" "ErsatzTV/ErsatzTV" "prebuild" "latest" "/opt/ErsatzTV" "*linux-x64.tar.gz"
 
