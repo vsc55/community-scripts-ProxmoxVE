@@ -24,12 +24,12 @@ motd_ssh
 customize
 
 msg_info "Creating Service"
-PASSWORD=$(omd create monitoring | grep "password:" | awk '{print $NF}')
+MKPASSWORD=$(omd create monitoring | grep "password:" | awk '{print $NF}')
 $STD omd start
 {
     echo "Application-Credentials"
     echo "Username: cmkadmin"
-    echo "Password: $PASSWORD"
+    echo "Password: $MKPASSWORD"
 } >>~/checkmk.creds
 msg_ok "Created Service"
 
