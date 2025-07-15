@@ -24,7 +24,7 @@ motd_ssh
 customize
 
 msg_info "Creating Service"
-SITE_NAME="monitoring4"
+SITE_NAME="monitoring"
 $STD omd create "$SITE_NAME"
 MKPASSWORD=$(openssl rand -base64 18 | tr -d '/+=' | cut -c1-16)
 
