@@ -20,73 +20,42 @@ $STD apt-get -y install \
   apache2-utils \
   logrotate \
   build-essential \
+  jq \
   git
 msg_ok "Installed Dependencies"
+
+NODE_VERSION="20" NODE_MODULE="yarn" NODE_OPTIONS="--openssl-legacy-provider" setup_nodejs
+PYTHON_VERSION="3.12" setup_uv
+fetch_and_deploy_gh_release "nginxproxymanager" "NginxProxyManager/nginx-proxy-manager" "tarball" "latest" "/tmp/nginxproxymanager"
 
 msg_info "Installing Python Dependencies"
 $STD apt-get install -y \
   python3 \
   python3-dev \
-  python3-pip \
-  python3-venv \
-  python3-cffi \
-  python3-certbot \
-  python3-certbot-dns-cloudflare
-$STD pip3 install certbot-dns-multi
-$STD python3 -m venv /opt/certbot/
-rm -rf /usr/lib/python3.*/EXTERNALLY-MANAGED
+  python3-venv
 msg_ok "Installed Python Dependencies"
 
-VERSION="$(awk -F'=' '/^VERSION_CODENAME=/{ print $NF }' /etc/os-release)"
+msg_info "Setting up Certbot Environment"
+$STD uv venv /opt/certbot --python "$PYTHON_VERSION"
+/opt/certbot/bin/uv pip install \
+  certbot \
+  certbot-dns-cloudflare \
+  certbot-dns-multi
+msg_ok "Certbot Environment Ready"
 
 msg_info "Installing Openresty"
+VERSION="$(awk -F'=' '/^VERSION_CODENAME=/{ print $NF }' /etc/os-release)"
 curl -fsSL "https://openresty.org/package/pubkey.gpg" | gpg --dearmor -o /etc/apt/trusted.gpg.d/openresty-archive-keyring.gpg
-echo -e "deb http://openresty.org/package/debian bullseye openresty" >/etc/apt/sources.list.d/openresty.list
+echo -e "deb http://openresty.org/package/debian $VERSION openresty" >/etc/apt/sources.list.d/openresty.list
 $STD apt-get update
 $STD apt-get -y install openresty
 msg_ok "Installed Openresty"
 
-msg_info "Installing Node.js"
-$STD bash <(curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh)
-source ~/.bashrc
-$STD nvm install 16.20.2
-ln -sf /root/.nvm/versions/node/v16.20.2/bin/node /usr/bin/node
-msg_ok "Installed Node.js"
-
-msg_info "Installing pnpm"
-$STD npm install -g pnpm@8.15
-msg_ok "Installed pnpm"
-
-RELEASE=$(curl -fsSL https://api.github.com/repos/NginxProxyManager/nginx-proxy-manager/releases/latest |
-  grep "tag_name" |
-  awk '{print substr($2, 3, length($2)-4) }')
-
-read -r -p "${TAB3}Would you like to install an older version (v2.10.4)? <y/N> " prompt
-if [[ ${prompt,,} =~ ^(y|yes)$ ]]; then
-  msg_info "Downloading Nginx Proxy Manager v2.10.4"
-  curl -fsSL "https://codeload.github.com/NginxProxyManager/nginx-proxy-manager/tar.gz/v2.10.4" | tar -xz
-  cd ./nginx-proxy-manager-2.10.4
-  msg_ok "Downloaded Nginx Proxy Manager v2.10.4"
-else
-  msg_info "Downloading Nginx Proxy Manager v${RELEASE}"
-  curl -fsSL "https://codeload.github.com/NginxProxyManager/nginx-proxy-manager/tar.gz/v${RELEASE}" | tar -xz
-  cd ./nginx-proxy-manager-"${RELEASE}"
-  msg_ok "Downloaded Nginx Proxy Manager v${RELEASE}"
-fi
 msg_info "Setting up Environment"
 ln -sf /usr/bin/python3 /usr/bin/python
-ln -sf /usr/bin/certbot /opt/certbot/bin/certbot
+ln -sf /opt/certbot/bin/certbot /usr/bin/certbot
 ln -sf /usr/local/openresty/nginx/sbin/nginx /usr/sbin/nginx
 ln -sf /usr/local/openresty/nginx/ /etc/nginx
-if [[ ${prompt,,} =~ ^(y|yes)$ ]]; then
-  sed -i "s|\"version\": \"0.0.0\"|\"version\": \"2.10.4\"|" backend/package.json
-  sed -i "s|\"version\": \"0.0.0\"|\"version\": \"2.10.4\"|" frontend/package.json
-else
-  sed -i "s|\"version\": \"0.0.0\"|\"version\": \"$RELEASE\"|" backend/package.json
-  sed -i "s|\"version\": \"0.0.0\"|\"version\": \"$RELEASE\"|" frontend/package.json
-fi
-sed -i 's|"fork-me": ".*"|"fork-me": "Proxmox VE Helper-Scripts"|' frontend/js/i18n/messages.json
-sed -i "s|https://github.com.*source=nginx-proxy-manager|https://helper-scripts.com|g" frontend/js/app/ui/footer/main.ejs
 sed -i 's+^daemon+#daemon+g' docker/rootfs/etc/nginx/nginx.conf
 NGINX_CONFS=$(find "$(pwd)" -type f -name "*.conf")
 for NGINX_CONF in $NGINX_CONFS; do
@@ -94,6 +63,7 @@ for NGINX_CONF in $NGINX_CONFS; do
 done
 
 mkdir -p /var/www/html /etc/nginx/logs
+cd /tmp/nginxproxymanager
 cp -r docker/rootfs/var/www/html/* /var/www/html/
 cp -r docker/rootfs/etc/nginx/* /etc/nginx/
 cp docker/rootfs/etc/letsencrypt.ini /etc/letsencrypt.ini
@@ -128,15 +98,15 @@ if [ ! -f /data/nginx/dummycert.pem ] || [ ! -f /data/nginx/dummykey.pem ]; then
 fi
 
 mkdir -p /app/global /app/frontend/images
+cd /tmp/nginxproxymanager
 cp -r backend/* /app
 cp -r global/* /app/global
 msg_ok "Set up Environment"
 
 msg_info "Building Frontend"
-cd ./frontend
-$STD pnpm install
-$STD pnpm upgrade
-$STD pnpm run build
+cd /tmp/nginxproxymanager/frontend
+$STD yarn install --frozen-lockfile
+$STD yarn build
 cp -r dist/* /app/frontend
 cp -r app-images/* /app/frontend/images
 msg_ok "Built Frontend"
@@ -159,7 +129,7 @@ if [ ! -f /app/config/production.json ]; then
 EOF
 fi
 cd /app
-$STD pnpm install
+$STD yarn install --production
 msg_ok "Initialized Backend"
 
 msg_info "Creating Service"
@@ -172,8 +142,9 @@ Wants=openresty.service
 [Service]
 Type=simple
 Environment=NODE_ENV=production
+Environment=NODE_OPTIONS=--openssl-legacy-provider
 ExecStartPre=-mkdir -p /tmp/nginx/body /data/letsencrypt-acme-challenge
-ExecStart=/usr/bin/node index.js --abort_on_uncaught_exception --max_old_space_size=250
+ExecStart=/usr/bin/node index.js --abort_on_uncaught_exception --max_old_space_size=1024
 WorkingDirectory=/app
 Restart=on-failure
 
@@ -188,13 +159,12 @@ customize
 msg_info "Starting Services"
 sed -i 's/user npm/user root/g; s/^pid/#pid/g' /usr/local/openresty/nginx/conf/nginx.conf
 sed -r -i 's/^([[:space:]]*)su npm npm/\1#su npm npm/g;' /etc/logrotate.d/nginx-proxy-manager
-sed -i 's/include-system-site-packages = false/include-system-site-packages = true/g' /opt/certbot/pyvenv.cfg
 systemctl enable -q --now openresty
 systemctl enable -q --now npm
 msg_ok "Started Services"
 
 msg_info "Cleaning up"
-rm -rf ../nginx-proxy-manager-*
+rm -rf /tmp/*
 systemctl restart openresty
 $STD apt-get -y autoremove
 $STD apt-get -y autoclean
