@@ -28,16 +28,13 @@ SITE_NAME="monitoring4"
 $STD omd create "$SITE_NAME"
 MKPASSWORD=$(openssl rand -base64 18 | tr -d '/+=' | cut -c1-16)
 
-su - "$SITE_NAME" -c "cmk-passwd cmkadmin <<EOF
-$MKPASSWORD
-$MKPASSWORD
-EOF" >/dev/null
+echo -e "$MKPASSWORD\n$MKPASSWORD" | su - "$SITE_NAME" -c "cmk-passwd cmkadmin --stdin"
 $STD omd start "$SITE_NAME"
 
 {
   echo "Application-Credentials"
   echo "Username: cmkadmin"
-  echo "Password: $PASSWORD"
+  echo "Password: $MKPASSWORD"
   echo "Site: $SITE_NAME"
 } >>~/checkmk.creds
 
