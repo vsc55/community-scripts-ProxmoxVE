@@ -6,7 +6,7 @@
   ],
   "date_created": "2025-07-17",
   "type": "ct",
-  "updateable": false,
+  "updateable": true,
   "privileged": false,
   "interface_port": 5212,
   "documentation": "https://docs.cloudreve.org/en/",
