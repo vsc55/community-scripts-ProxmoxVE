@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
-source <(curl -s https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/misc/build.func)
+source <(curl -s https://raw.githubusercontent.com/vsc55/community-scripts-ProxmoxVE/refs/heads/freepbx-opensourceonly/misc/build.func)
 # Copyright (c) 2021-2025 community-scripts ORG
 # Author: Arian Nasr (arian-nasr)
+# Updated by: Javier Pastor (vsc55) 
+#   - Add OpenSource modules option
+#   - Add verbose mode
+#   - Add update only base system, not modules.
 # License: MIT | https://github.com/community-scripts/ProxmoxVE/raw/main/LICENSE
 # Source: https://www.freepbx.org/
 
@@ -19,6 +23,14 @@ variables
 color
 catch_errors
 
+run_bin() {
+  if [[ "$VERBOSE" == "yes" ]]; then
+    "$@"
+  else
+    $STD "$@"
+  fi
+}
+
 function update_script() {
     header_info
     check_container_storage
@@ -28,11 +40,28 @@ function update_script() {
         msg_error "No ${APP} Installation Found!"
         exit
     fi
-    msg_error "Currently we don't provide an update function for this ${APP}."
+
+    msg_info "Updating $APP LXC"
+    run_bin apt-get update
+    run_bin apt-get -y upgrade
+    msg_ok "Updated $APP LXC"
+
+    msg_info "Updating $APP Modules"
+    run_bin fwconsole ma updateall
+    run_bin fwconsole reload
+    msg_ok "Updated $APP Modules"
+
     exit
 }
 
 start
+
+if whiptail --title "Comercial Modules?" --yesno "Remove Commercial modules?" --defaultno 10 50; then
+  export ONLY_OPENSOURCE="yes"
+else
+  export ONLY_OPENSOURCE="no"
+fi
+
 build_container
 description
 
