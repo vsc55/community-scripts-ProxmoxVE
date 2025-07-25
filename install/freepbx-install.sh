@@ -60,15 +60,43 @@ has_commercial_modules() {
 run_bin_remove() {
   local err=0
   while read -r module; do
+    local code=0
+    local command="fwconsole ma -f remove $module"
+
     msg_info "Removing module: $module"
-    run_bin fwconsole ma -f remove "$module" || err=$?
+    if [[ "$VERBOSE" == "yes" ]]; then
+      msg_info "Running command [$command]...\n"
+      fwconsole ma -f remove "$module"
+      code=$?
+      if [[ $code -ne 0 ]]; then
+        msg_error "Command [$command] failed with exit code $code\n"
+      else 
+        msg_ok "Command completed successfully [$command]\n"
+      fi
+    else
+      $STD fwconsole ma -f remove "$module"
+      code=$?
+    fi
+
+
+
+
+
+
+    # run_bin fwconsole ma -f remove "$module" || err=$?
     #|| err=1
     
-    if [[ $err -ne 0 ]]; then
-      msg_error "Failed to remove module: $module - error code $err"
-    else
-      msg_ok "Module $module removed successfully"
-    fi
+    # if [[ $err -ne 0 ]]; then
+    #   msg_error "Failed to remove module: $module - error code $err"
+    # else
+    #   msg_ok "Module $module removed successfully"
+    # fi
+
+
+
+
+
+
 
   done < <(fwconsole ma list | awk '/Commercial/ {print $2}')
   return $err
@@ -108,6 +136,8 @@ if [[ $ONLY_OPENSOURCE == "yes" ]]; then
   count=0
   # while output=$(fwconsole ma list | awk '/Commercial/ {print $2}'); do
   while true; do
+    local err_code=0
+
     ! has_commercial_modules && break
 
     count=$((count + 1))
@@ -115,8 +145,8 @@ if [[ $ONLY_OPENSOURCE == "yes" ]]; then
     # run_bin fwconsole ma list | awk '/Commercial/ {print $2}' | xargs -I {} fwconsole ma -f remove {}
     # err_code=$?
 
-    run_bin_remove
-    err_code=$?
+    err_code=run_bin_remove
+    # err_code=$?
 
     # Note: Code 123 may not be an error, it could be dependencies. We'll try again.
     if [[ $err_code -ne 0 && $err_code -ne 123 ]]; then
