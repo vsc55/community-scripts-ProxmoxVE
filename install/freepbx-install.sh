@@ -64,33 +64,35 @@ run_bin_remove() {
     local command="fwconsole ma -f remove $module"
 
     msg_info "Removing module: $module"
-    if [[ "$VERBOSE" == "yes" ]]; then
-      msg_info "Running command [$command]...\n"
-      fwconsole ma -f remove "$module"
-      code=$?
-      if [[ $code -ne 0 ]]; then
-        msg_error "Command [$command] failed with exit code $code\n"
-      else 
-        msg_ok "Command completed successfully [$command]\n"
-      fi
-    else
-      $STD fwconsole ma -f remove "$module"
-      code=$?
-    fi
+
+
+    # if [[ "$VERBOSE" == "yes" ]]; then
+    #   msg_info "Running command [$command]...\n"
+    #   fwconsole ma -f remove "$module"
+    #   code=$?
+    #   if [[ $code -ne 0 ]]; then
+    #     msg_error "Command [$command] failed with exit code $code\n"
+    #   else 
+    #     msg_ok "Command completed successfully [$command]\n"
+    #   fi
+    # else
+    #   $STD fwconsole ma -f remove "$module"
+    #   code=$?
+    # fi
 
 
 
 
 
 
-    # run_bin fwconsole ma -f remove "$module" || err=$?
+    run_bin fwconsole ma -f remove "$module" || code=$?
     #|| err=1
     
-    # if [[ $err -ne 0 ]]; then
-    #   msg_error "Failed to remove module: $module - error code $err"
-    # else
-    #   msg_ok "Module $module removed successfully"
-    # fi
+    if [[ $code -ne 0 ]]; then
+      msg_error "Failed to remove module: $module - error code $code"
+    else
+      msg_ok "Module $module removed successfully"
+    fi
 
 
 
@@ -102,45 +104,21 @@ run_bin_remove() {
   return $err
 }
 
-msg_info "Downloading FreePBX installation script..."
-if curl -fsSL "$INSTALL_URL" -o "$INSTALL_PATH"; then
-  msg_ok "Download completed successfully"
-else
-  curl_exit_code=$?
-  msg_error "Error downloading FreePBX installation script (curl exit code: $curl_exit_code)"
-  msg_error "Aborting!"
-  exit 1
-fi
 
-# read -n1 -rp "${TAB3}Remove Commercial modules? [y/N] " prompt
-# echo
-install_args=""
-ONLY_OPENSOURCE="${ONLY_OPENSOURCE:-no}"
-# if [[ ${prompt,,} =~ ^(y|yes|s|si)$ ]]; then
-#   only_opensource="yes"
-# else
-#   only_opensource="no"
-# fi
-
-msg_ok "Remove Commercial modules is set to: $ONLY_OPENSOURCE"
-
-
-print_msg_info "Installing FreePBX, be patient, this takes time..." "Installing FreePBX (Verbose)\n"
-run_bin bash "$INSTALL_PATH" $install_args
-
-if [[ $ONLY_OPENSOURCE == "yes" ]]; then
+uninstall_modules_commercial() {
   
   print_msg_info "Removing Commercial modules..."
   
   max_tries=5
   count=0
   # while output=$(fwconsole ma list | awk '/Commercial/ {print $2}'); do
-  while true; do
+  while has_commercial_modules; do
     local err_code=0
 
-    ! has_commercial_modules && break
+    # ! has_commercial_modules && break
 
     count=$((count + 1))
+    msg_info "Attempt $count to remove commercial modules..."
 
     # run_bin fwconsole ma list | awk '/Commercial/ {print $2}' | xargs -I {} fwconsole ma -f remove {}
     # err_code=$?
@@ -149,11 +127,11 @@ if [[ $ONLY_OPENSOURCE == "yes" ]]; then
     # err_code=$?
 
     # Note: Code 123 may not be an error, it could be dependencies. We'll try again.
-    if [[ $err_code -ne 0 && $err_code -ne 123 ]]; then
-      msg_error "Error removing commercial modules (exit code: $err_code)"
-      msg_error "Please check the output above for details."
-      exit 1
-    fi
+    # if [[ $err_code -ne 0 && $err_code -ne 123 ]]; then
+    #   msg_error "Error removing commercial modules (exit code: $err_code)"
+    #   msg_error "Please check the output above for details."
+    #   exit 1
+    # fi
 
     # Check if there are still commercial modules left
     ! has_commercial_modules && break
@@ -166,6 +144,30 @@ if [[ $ONLY_OPENSOURCE == "yes" ]]; then
       msg_info "Removed commercial modules, retrying (attempt $count/$max_tries)..."
     fi
   done
+
+}
+
+
+
+msg_info "Downloading FreePBX installation script..."
+if curl -fsSL "$INSTALL_URL" -o "$INSTALL_PATH"; then
+  msg_ok "Download completed successfully"
+else
+  curl_exit_code=$?
+  msg_error "Error downloading FreePBX installation script (curl exit code: $curl_exit_code)"
+  msg_error "Aborting!"
+  exit 1
+fi
+
+install_args=""
+ONLY_OPENSOURCE="${ONLY_OPENSOURCE:-no}"
+msg_ok "Remove Commercial modules is set to: $ONLY_OPENSOURCE"
+
+print_msg_info "Installing FreePBX, be patient, this takes time..." "Installing FreePBX (Verbose)\n"
+run_bin bash "$INSTALL_PATH" $install_args
+
+if [[ $ONLY_OPENSOURCE == "yes" ]]; then
+  uninstall_modules_commercial
 
   msg_info "Reloading FreePBX..."
   run_bin fwconsole reload
