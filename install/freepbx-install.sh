@@ -24,8 +24,7 @@ run_bin() {
 
   if [[ "$VERBOSE" == "yes" ]]; then
     msg_info "Running command [$*]...\n"
-    # ( "$@" )
-    bash -c 'exec "$@"' _ "$@"
+    ( "$@" )
     code=$?
     if [[ $code -ne 0 ]]; then
       msg_error "Command failed [$*] with exit code $code\n"
@@ -62,8 +61,7 @@ run_bin_remove() {
   local err=0
   while read -r module; do
     msg_info "Removing module: $module"
-    run_bin fwconsole ma -f remove "$module" 
-    err=$?
+    run_bin fwconsole ma -f remove "$module" || err=$?
     #|| err=1
     
     if [[ $err -ne 0 ]]; then
