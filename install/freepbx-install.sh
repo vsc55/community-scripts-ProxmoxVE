@@ -24,7 +24,8 @@ run_bin() {
 
   if [[ "$VERBOSE" == "yes" ]]; then
     msg_info "Running command [$*]...\n"
-    ( "$@" )
+    # ( "$@" )
+    bash -c 'exec "$@"' _ "$@"
     code=$?
     if [[ $code -ne 0 ]]; then
       msg_error "Command failed [$*] with exit code $code\n"
