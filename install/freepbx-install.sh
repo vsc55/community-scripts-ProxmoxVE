@@ -22,12 +22,12 @@ update_os
 run_bin() {
   if [[ "$VERBOSE" == "yes" ]]; then
     msg_ok "Running command [$*]...\n"
-    "${@}"
+    $@
     if [[ $? -ne 0 ]]; then
       msg_error "Command failed [$*] with exit code $?\n"
     fi
   else
-    $STD "${@}"
+    $STD $@
   fi
   return $?
 }
