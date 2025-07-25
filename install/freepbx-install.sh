@@ -20,16 +20,22 @@ network_check
 update_os
 
 run_bin() {
+  local code=0
+
   if [[ "$VERBOSE" == "yes" ]]; then
-    msg_ok "Running command [$*]...\n"
-    $@
-    if [[ $? -ne 0 ]]; then
-      msg_error "Command failed [$*] with exit code $?\n"
+    msg_info "Running command [$*]...\n"
+    ( "$@" )
+    code=$?
+    if [[ $code -ne 0 ]]; then
+      msg_error "Command failed [$*] with exit code $code\n"
+    else 
+      msg_ok "Command completed successfully [$*]\n"
     fi
   else
-    $STD $@
+    $STD "$@"
+    code=$?
   fi
-  return $?
+  return $code
 }
 
 print_msg_info() {
