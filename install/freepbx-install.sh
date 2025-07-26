@@ -24,7 +24,7 @@ run_bin() {
 
   if [[ "$VERBOSE" == "yes" ]]; then
     msg_info "Running command [$*]...\n"
-    ( "$@" )
+    "$@"
     code=$?
     if [[ $code -ne 0 ]]; then
       msg_error "Command failed [$*] with exit code $code\n"
@@ -109,13 +109,12 @@ uninstall_modules_commercial() {
   
   print_msg_info "Removing Commercial modules..."
   
-  max_tries=5
-  count=0
+  local max=5
+  local count=0
+
   # while output=$(fwconsole ma list | awk '/Commercial/ {print $2}'); do
   while has_commercial_modules; do
-    local err_code=0
-
-    # ! has_commercial_modules && break
+    ! has_commercial_modules && break
 
     count=$((count + 1))
     msg_info "Attempt $count to remove commercial modules..."
@@ -123,25 +122,52 @@ uninstall_modules_commercial() {
     # run_bin fwconsole ma list | awk '/Commercial/ {print $2}' | xargs -I {} fwconsole ma -f remove {}
     # err_code=$?
 
-    err_code=run_bin_remove
+    # err_code=run_bin_remove
     # err_code=$?
 
-    # Note: Code 123 may not be an error, it could be dependencies. We'll try again.
-    # if [[ $err_code -ne 0 && $err_code -ne 123 ]]; then
-    #   msg_error "Error removing commercial modules (exit code: $err_code)"
-    #   msg_error "Please check the output above for details."
-    #   exit 1
-    # fi
+
+    
+    while read -r module; do
+      local code=0
+      local command="fwconsole ma -f remove $module"
+
+      msg_info "Removing module: $module"
+
+
+      # if [[ "$VERBOSE" == "yes" ]]; then
+      #   msg_info "Running command [$command]...\n"
+      #   fwconsole ma -f remove "$module"
+      #   code=$?
+      #   if [[ $code -ne 0 ]]; then
+      #     msg_error "Command [$command] failed with exit code $code\n"
+      #   else 
+      #     msg_ok "Command completed successfully [$command]\n"
+      #   fi
+      # else
+      #   $STD fwconsole ma -f remove "$module"
+      #   code=$?
+      # fi
+
+
+      run_bin fwconsole ma -f remove $module || code=$?
+      
+      if [[ $code -ne 0 ]]; then
+        msg_error "Failed to remove module: $module - error code $code"
+      else
+        msg_ok "Module $module removed successfully"
+      fi
+
+    done < <(fwconsole ma list | awk '/Commercial/ {print $2}')
 
     # Check if there are still commercial modules left
     ! has_commercial_modules && break
 
     # Timeout to avoid infinite loop
-    if [[ $count -ge $max_tries ]]; then
-      msg_warn "Failed to remove all commercial modules after $max_tries attempts, remove them manually in the web interface."
+    if [[ $count -ge $max ]]; then
+      msg_warn "Failed to remove all commercial modules after $max attempts, remove them manually in the web interface."
       break
     else
-      msg_info "Removed commercial modules, retrying (attempt $count/$max_tries)..."
+      msg_info "Removed commercial modules, retrying (attempt $count/$max)..."
     fi
   done
 
